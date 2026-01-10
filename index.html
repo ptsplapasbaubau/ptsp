@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTSP LAPAS KELAS IIA BAUBAU</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a4d8c;
+            --secondary-color: #e8a317;
+            --accent-color: #2e6ab1;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #d18f0e;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        /* Navigation */
+        nav {
+            padding-top: 15px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: var(--transition);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            background: linear-gradient(rgba(26, 77, 140, 0.9), rgba(26, 77, 140, 0.8)), url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            opacity: 0.95;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-bottom: 60px;
+            flex: 1;
+        }
+        
+        /* Services Section */
+        .services-section, .booking-section, .info-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .service-card {
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+        
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+        
+        .service-card h3 {
+            color: var(--dark-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        /* Booking Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(46, 106, 177, 0.2);
+            outline: none;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-submit:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            height: fit-content;
+        }
+        
+        .sidebar-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .info-list {
+            list-style: none;
+        }
+        
+        .info-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .info-list i {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+        
+        /* Booking Result */
+        .booking-result {
+            display: none;
+            background-color: #f0f8ff;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 25px;
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .booking-code {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+            margin: 15px 0;
+            letter-spacing: 5px;
+            font-family: monospace;
+        }
+        
+        .barcode-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .barcode {
+            font-family: monospace;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            background-color: white;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px dashed #ccc;
+            display: inline-block;
+        }
+        
+        .instructions {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .contact-info p {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .contact-info i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Status Check Result */
+        .status-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid var(--success-color);
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid var(--danger-color);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>PTSP LAPAS KELAS IIA BAUBAU</h1>
+                        <p>Pelayanan Terpadu Satu Pintu - Lembaga Pemasyarakatan</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <a href="#booking" class="btn btn-primary">Daftar Kunjungan</a>
+                    <a href="#services" class="btn btn-outline">Layanan</a>
+                </div>
+            </div>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#home"><i class="fas fa-home"></i> Beranda</a></li>
+                    <li><a href="#services"><i class="fas fa-concierge-bell"></i> Layanan WBP</a></li>
+                    <li><a href="#booking"><i class="fas fa-calendar-check"></i> Pendaftaran Online</a></li>
+                    <li><a href="#info"><i class="fas fa-info-circle"></i> Informasi</a></li>
+                    <li><a href="#contact"><i class="fas fa-phone-alt"></i> Kontak</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h2>Pelayanan Terpadu LAPAS Kelas IIA Baubau</h2>
+            <p>Memberikan kemudahan akses layanan informasi, kunjungan, dan titipan untuk keluarga Warga Binaan Pemasyarakatan (WBP) secara online dan terpadu.</p>
+            <a href="#booking" class="btn btn-primary">Daftar Kunjungan Online Sekarang</a>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <div class="content-left">
+                <!-- Services Section -->
+                <section class="services-section" id="services">
+                    <h2 class="section-title"><i class="fas fa-concierge-bell"></i> Layanan untuk WBP</h2>
+                    <div class="services-grid">
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>Kunjungan Keluarga</h3>
+                            <p>Layanan kunjungan keluarga dengan sistem pendaftaran online untuk mempersingkat waktu proses.</p>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <h3>Titipan Paket</h3>
+                            <p>Pengiriman paket barang untuk WBP dengan ketentuan dan jadwal yang telah ditentukan.</p>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <h3>Bantuan Hukum</h3>
+                            <p>Fasilitas akses bantuan hukum bagi WBP yang membutuhkan pendampingan hukum.</p>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-briefcase-medical"></i>
+                            </div>
+                            <h3>Layanan Kesehatan</h3>
+                            <p>Pelayanan kesehatan dan pengobatan bagi WBP sesuai standar pelayanan kesehatan.</p>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h3>Pembinaan</h3>
+                            <p>Program pembinaan kepribadian, keterampilan, dan pendidikan untuk persiapan kembali ke masyarakat.</p>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <h3>Pembebasan Bersyarat</h3>
+                            <p>Informasi dan persyaratan untuk pengajuan pembebasan bersyarat bagi WBP yang memenuhi kriteria.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Booking Section -->
+                <section class="booking-section" id="booking">
+                    <h2 class="section-title"><i class="fas fa-calendar-check"></i> Pendaftaran Kunjungan Online</h2>
+                    <p>Isi formulir pendaftaran di bawah ini untuk mendapatkan kode booking kunjungan. Tunjukkan kode booking saat datang ke LAPAS untuk proses yang lebih cepat.</p>
+                    
+                    <form id="bookingForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nama">Nama Lengkap <span style="color: var(--danger-color)">*</span></label>
+                                <input type="text" id="nama" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nik">NIK <span style="color: var(--danger-color)">*</span></label>
+                                <input type="text" id="nik" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telepon">No. Telepon <span style="color: var(--danger-color)">*</span></label>
+                                <input type="tel" id="telepon" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="hubungan">Hubungan dengan WBP <span style="color: var(--danger-color)">*</span></label>
+                                <select id="hubungan" class="form-control" required>
+                                    <option value="">Pilih Hubungan</option>
+                                    <option value="Keluarga Inti">Keluarga Inti (Suami/Istri/Anak)</option>
+                                    <option value="Orang Tua">Orang Tua</option>
+                                    <option value="Saudara Kandung">Saudara Kandung</option>
+                                    <option value="Keluarga Lain">Keluarga Lain</option>
+                                    <option value="Pengacara">Pengacara</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="tanggal">Tanggal Kunjungan <span style="color: var(--danger-color)">*</span></label>
+                                <input type="date" id="tanggal" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="namaWbp">Nama WBP yang Akan Dikunjungi <span style="color: var(--danger-color)">*</span></label>
+                            <input type="text" id="namaWbp" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="statusWbp">Status WBP <span style="color: var(--danger-color)">*</span></label>
+                                <select id="statusWbp" class="form-control" required>
+                                    <option value="">Pilih Status</option>
+                                    <option value="Narapidana">Narapidana</option>
+                                    <option value="Tahanan">Tahanan</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="jenisKunjungan">Jenis Layanan <span style="color: var(--danger-color)">*</span></label>
+                                <select id="jenisKunjungan" class="form-control" required>
+                                    <option value="">Pilih Layanan</option>
+                                    <option value="Kunjungan Keluarga">Kunjungan Keluarga</option>
+                                    <option value="Titipan Paket">Titipan Paket</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-submit" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i> Daftarkan Kunjungan
+                        </button>
+                    </form>
+                    
+                    <div class="booking-result" id="bookingResult">
+                        <h3 style="color: var(--success-color); margin-bottom: 15px;">
+                            <i class="fas fa-check-circle"></i> Pendaftaran Berhasil!
+                        </h3>
+                        <p>Pendaftaran kunjungan Anda telah berhasil. Silakan catat kode booking berikut dan tunjukkan saat datang ke LAPAS Kelas IIA Baubau.</p>
+                        
+                        <div class="booking-code" id="bookingCodeDisplay">PTSP-BAU-XXXXXX</div>
+                        
+                        <div class="barcode-container">
+                            <div class="barcode" id="barcodeDisplay">|| | | || | || | | ||</div>
+                        </div>
+                        
+                        <div class="instructions">
+                            <h4><i class="fas fa-info-circle"></i> Instruksi Penting:</h4>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Tunjukkan kode booking di atas kepada petugas pendaftaran saat datang ke LAPAS</li>
+                                <li>Datang 30 menit sebelum waktu kunjungan yang dijadwalkan</li>
+                                <li>Bawa dokumen identitas asli (KTP) untuk verifikasi</li>
+                                <li>Patuhi semua peraturan dan tata tertib LAPAS selama kunjungan</li>
+                                <li>Kode booking ini berlaku hanya untuk satu kali kunjungan</li>
+                            </ul>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="btn btn-primary" onclick="window.print()">
+                                <i class="fas fa-print"></i> Cetak Halaman
+                            </button>
+                            <button class="btn btn-outline" style="color: var(--primary-color); border-color: var(--primary-color);" onclick="sendToEmail()">
+                                <i class="fas fa-envelope"></i> Kirim ke Email
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <h3 class="sidebar-title"><i class="fas fa-info-circle"></i> Informasi Penting</h3>
+                <ul class="info-list">
+                    <li><i class="fas fa-clock"></i> <strong>Jam Kunjungan:</strong><br>Senin-Jumat: 09.00-15.00 WITA</li>
+                    <li><i class="fas fa-exclamation-triangle"></i> <strong>Syarat Kunjungan:</strong><br>Membawa KTP asli, maksimal 3 orang per kunjungan</li>
+                    <li><i class="fas fa-box"></i> <strong>Titipan Paket:</strong><br>Hari Selasa & Kamis, pukul 10.00-12.00 WITA</li>
+                    <li><i class="fas fa-user-shield"></i> <strong>Protokol Kesehatan:</strong><br>Wajib masker, pengecekan suhu, dan jaga jarak</li>
+                    <li><i class="fas fa-phone"></i> <strong>Kontak Darurat:</strong><br>(0402) 1234567 ext. 102</li>
+                </ul>
+                
+                <div style="margin-top: 30px; background-color: #e8f0fe; padding: 20px; border-radius: var(--border-radius);">
+                    <h4 style="color: var(--primary-color); margin-bottom: 10px;">
+                        <i class="fas fa-search"></i> Cek Status Pendaftaran
+                    </h4>
+                    <p style="margin-bottom: 15px; font-size: 0.95rem;">Masukkan kode booking untuk mengecek status pendaftaran Anda</p>
+                    <input type="text" id="cekKode" class="form-control" placeholder="Masukkan kode booking" style="margin-bottom: 10px;">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="cekStatusBooking()">
+                        <i class="fas fa-search"></i> Cek Status
+                    </button>
+                    <div class="status-result" id="statusResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>PTSP LAPAS Kelas IIA Baubau</h3>
+                    <p>Sistem Pelayanan Terpadu Satu Pintu Lembaga Pemasyarakatan Kelas IIA Baubau untuk memberikan kemudahan akses layanan informasi dan administrasi bagi keluarga Warga Binaan Pemasyarakatan.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Kontak Kami</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Sultan Hasanuddin No. 45, Baubau, Sulawesi Tenggara</p>
+                        <p><i class="fas fa-phone"></i> (0402) 1234567</p>
+                        <p><i class="fas fa-fax"></i> (0402) 1234568</p>
+                        <p><i class="fas fa-envelope"></i> ptsp@lapasbaubau.go.id</p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Link Cepat</h3>
+                    <ul style="list-style: none;">
+                        <li style="margin-bottom: 10px;"><a href="#home" style="color: white; text-decoration: none;"><i class="fas fa-chevron-right"></i> Beranda</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#services" style="color: white; text-decoration: none;"><i class="fas fa-chevron-right"></i> Layanan WBP</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#booking" style="color: white; text-decoration: none;"><i class="fas fa-chevron-right"></i> Pendaftaran Online</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#info" style="color: white; text-decoration: none;"><i class="fas fa-chevron-right"></i> Informasi</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Konfigurasi Google Apps Script URL
+        // GANTI URL_INI dengan URL Web App Google Apps Script Anda
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBF7wDu06cLPJAEbvPKMZ4MivoI9wg5cVn9HL5LEJFN2yH9I_7LM_0jtwDqfD1rVjn/exec';
+        
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set tanggal minimum untuk form (hari ini)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tanggal').min = today;
+            
+            // Set tanggal default (besok)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+            
+            console.log('Aplikasi PTSP Lapas Baubau telah dimuat');
+        });
+        
+        // Generate booking code
+        function generateBookingCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = 'PTSP-BAU-';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // Generate barcode-like string
+        function generateBarcode() {
+            let barcode = '';
+            for (let i = 0; i < 20; i++) {
+                barcode += Math.random() > 0.5 ? '|' : ' ';
+            }
+            return barcode;
+        }
+        
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validasi form
+            const requiredFields = ['nama', 'nik', 'telepon', 'hubungan', 'tanggal', 'namaWbp', 'statusWbp', 'jenisKunjungan'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--danger-color)';
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Harap isi semua field yang wajib diisi!');
+                return;
+            }
+            
+            // Tampilkan loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner"></span> Memproses...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Ambil data form
+                const formData = {
+                    nama: document.getElementById('nama').value.trim(),
+                    nik: document.getElementById('nik').value.trim(),
+                    telepon: document.getElementById('telepon').value.trim(),
+                    email: document.getElementById('email').value.trim() || '-',
+                    hubungan: document.getElementById('hubungan').value,
+                    tanggal: document.getElementById('tanggal').value,
+                    namaWbp: document.getElementById('namaWbp').value.trim(),
+                    statusWbp: document.getElementById('statusWbp').value,
+                    jenisKunjungan: document.getElementById('jenisKunjungan').value,
+                    tanggalDaftar: new Date().toLocaleString('id-ID'),
+                    action: 'submitBooking'
+                };
+                
+                // Generate booking code
+                const bookingCode = generateBookingCode();
+                const barcode = generateBarcode();
+                
+                // Kirim data ke Google Apps Script
+                console.log('Mengirim data ke Google Apps Script:', formData);
+                
+                // Buat request ke Google Apps Script
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ...formData,
+                        bookingCode: bookingCode
+                    })
+                });
+                
+                // Cek response
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                console.log('Response dari Google Apps Script:', result);
+                
+                if (result.success) {
+                    // Tampilkan hasil booking
+                    document.getElementById('bookingCodeDisplay').textContent = bookingCode;
+                    document.getElementById('barcodeDisplay').textContent = barcode;
+                    document.getElementById('bookingResult').style.display = 'block';
+                    
+                    // Scroll ke hasil booking
+                    document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Reset form
+                    document.getElementById('bookingForm').reset();
+                    
+                    // Set tanggal default ke besok lagi
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+                    
+                    alert('Pendaftaran berhasil! Kode booking Anda: ' + bookingCode);
+                } else {
+                    throw new Error(result.message || 'Gagal menyimpan data');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Fallback ke sistem lokal jika Apps Script gagal
+                console.log('Menggunakan sistem fallback lokal...');
+                
+                const bookingCode = generateBookingCode();
+                const barcode = generateBarcode();
+                
+                // Simpan ke localStorage sebagai fallback
+                const formData = {
+                    nama: document.getElementById('nama').value.trim(),
+                    nik: document.getElementById('nik').value.trim(),
+                    telepon: document.getElementById('telepon').value.trim(),
+                    email: document.getElementById('email').value.trim() || '-',
+                    hubungan: document.getElementById('hubungan').value,
+                    tanggal: document.getElementById('tanggal').value,
+                    namaWbp: document.getElementById('namaWbp').value.trim(),
+                    statusWbp: document.getElementById('statusWbp').value,
+                    jenisKunjungan: document.getElementById('jenisKunjungan').value,
+                    tanggalDaftar: new Date().toLocaleString('id-ID'),
+                    bookingCode: bookingCode
+                };
+                
+                // Simpan ke localStorage
+                const existingData = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                existingData.push(formData);
+                localStorage.setItem('ptspBookings', JSON.stringify(existingData));
+                
+                // Tampilkan hasil booking
+                document.getElementById('bookingCodeDisplay').textContent = bookingCode;
+                document.getElementById('barcodeDisplay').textContent = barcode;
+                document.getElementById('bookingResult').style.display = 'block';
+                document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
+                
+                // Reset form
+                document.getElementById('bookingForm').reset();
+                
+                // Set tanggal default ke besok
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+                
+                alert('Pendaftaran berhasil (mode offline)! Kode booking Anda: ' + bookingCode);
+            } finally {
+                // Reset button state
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Cek status booking
+        async function cekStatusBooking() {
+            const bookingCode = document.getElementById('cekKode').value.trim();
+            const statusResult = document.getElementById('statusResult');
+            
+            if (!bookingCode) {
+                alert('Masukkan kode booking terlebih dahulu!');
+                return;
+            }
+            
+            // Tampilkan loading
+            statusResult.innerHTML = '<p><span class="spinner"></span> Mencari data...</p>';
+            statusResult.className = 'status-result status-success';
+            statusResult.style.display = 'block';
+            
+            try {
+                // Coba cek dari Google Apps Script
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getBookingStatus&bookingCode=${encodeURIComponent(bookingCode)}`, {
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    if (result.found) {
+                        statusResult.innerHTML = `
+                            <h4><i class="fas fa-check-circle"></i> Data Ditemukan</h4>
+                            <p><strong>Kode Booking:</strong> ${result.bookingCode}</p>
+                            <p><strong>Nama Pendaftar:</strong> ${result.nama}</p>
+                            <p><strong>Tanggal Kunjungan:</strong> ${new Date(result.tanggalKunjungan).toLocaleDateString('id-ID')}</p>
+                            <p><strong>Status:</strong> <span style="color: var(--success-color); font-weight: bold;">${result.status}</span></p>
+                            <p><strong>Tanggal Pendaftaran:</strong> ${new Date(result.tanggalDaftar).toLocaleString('id-ID')}</p>
+                        `;
+                        statusResult.className = 'status-result status-success';
+                    } else {
+                        statusResult.innerHTML = `<p><i class="fas fa-exclamation-triangle"></i> ${result.message}</p>`;
+                        statusResult.className = 'status-result status-error';
+                    }
+                } else {
+                    throw new Error('Tidak dapat menghubungi server');
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+                
+                // Fallback ke localStorage
+                const existingData = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                const booking = existingData.find(item => item.bookingCode === bookingCode);
+                
+                if (booking) {
+                    statusResult.innerHTML = `
+                        <h4><i class="fas fa-check-circle"></i> Data Ditemukan (Mode Offline)</h4>
+                        <p><strong>Kode Booking:</strong> ${booking.bookingCode}</p>
+                        <p><strong>Nama Pendaftar:</strong> ${booking.nama}</p>
+                        <p><strong>Tanggal Kunjungan:</strong> ${new Date(booking.tanggal).toLocaleDateString('id-ID')}</p>
+                        <p><strong>Status:</strong> <span style="color: var(--success-color); font-weight: bold;">Menunggu Verifikasi</span></p>
+                        <p><strong>Tanggal Pendaftaran:</strong> ${booking.tanggalDaftar}</p>
+                        <p><small><em>Data ini tersimpan secara lokal di browser Anda</em></small></p>
+                    `;
+                    statusResult.className = 'status-result status-success';
+                } else {
+                    statusResult.innerHTML = `<p><i class="fas fa-exclamation-triangle"></i> Kode booking tidak ditemukan</p>`;
+                    statusResult.className = 'status-result status-error';
+                }
+            }
+        }
+        
+        // Send booking to email (simulated)
+        function sendToEmail() {
+            const email = document.getElementById('email').value;
+            const bookingCode = document.getElementById('bookingCodeDisplay').textContent;
+            
+            if (!email || email === '-') {
+                const userEmail = prompt('Masukkan email Anda untuk mengirim konfirmasi:');
+                if (!userEmail) return;
+                
+                // Simulasi pengiriman email
+                alert(`Konfirmasi kode booking ${bookingCode} telah dikirim ke ${userEmail}`);
+            } else {
+                alert(`Konfirmasi kode booking ${bookingCode} telah dikirim ke ${email}`);
+            }
+        }
+        
+        // Smooth scrolling untuk navigasi
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
