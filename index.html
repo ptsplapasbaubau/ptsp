@@ -6,6 +6,7 @@
     <title>PTSP LAPAS KELAS IIA BAUBAU</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* (CSS tetap sama seperti sebelumnya) */
         :root {
             --primary-color: #1a4d8c;
             --secondary-color: #e8a317;
@@ -700,7 +701,7 @@
                         <h3 style="color: var(--success-color); margin-bottom: 15px;"><i class="fas fa-check-circle"></i> Pendaftaran Berhasil!</h3>
                         <p>Pendaftaran kunjungan Anda telah berhasil. Silakan catat kode booking berikut dan tunjukkan saat datang ke LAPAS Kelas IIA Baubau.</p>
                         
-                        <div class="booking-code" id="bookingCodeDisplay">PTSP-BAU-XXXXXX</div>
+                        <div class="booking-code" id="bookingCodeDisplay">PTSP-XXXXXX</div>
                         
                         <div class="barcode-container">
                             <div class="barcode" id="barcodeDisplay">|| | | || | || | | ||</div>
@@ -787,6 +788,11 @@
         // URL Google Apps Script Anda
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
         
+        // Flag untuk mencegah submit ganda
+        let isSubmitting = false;
+        // Session ID untuk identifikasi session browser
+        const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        
         // Set minimum date to today for booking form
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
@@ -797,8 +803,13 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
             
-            // Coba sync data lokal jika ada
-            trySyncLocalData();
+            // Inisialisasi localStorage jika kosong
+            if (!localStorage.getItem('ptspBookings')) {
+                localStorage.setItem('ptspBookings', JSON.stringify([]));
+            }
+            
+            // Coba sinkron data lokal jika ada (dengan interval lebih lama)
+            setTimeout(trySyncLocalData, 3000);
         });
         
         // Generate booking code
@@ -878,9 +889,35 @@
             }
         }
         
+        // Cek duplikasi data
+        function isDuplicateData(formData) {
+            try {
+                const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                
+                // Cek berdasarkan kombinasi NIK dan tanggal kunjungan
+                return bookings.some(booking => 
+                    booking.nik === formData.nik && 
+                    booking.tanggal === formData.tanggal &&
+                    // Data baru (dalam 5 menit terakhir)
+                    (new Date() - new Date(booking.savedAt)) < 5 * 60 * 1000
+                );
+            } catch (error) {
+                console.error('Error checking duplicate:', error);
+                return false;
+            }
+        }
+        
         // Handle form submission
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Cegah submit ganda
+            if (isSubmitting) {
+                showNotification('Sedang memproses pendaftaran sebelumnya...', 'warning');
+                return;
+            }
+            
+            isSubmitting = true;
             
             // Get form values
             const formData = {
@@ -894,18 +931,28 @@
                 statusWbp: document.getElementById('statusWbp').value,
                 jenisKunjungan: document.getElementById('jenisKunjungan').value,
                 tanggalDaftar: new Date().toLocaleString('id-ID'),
-                source: 'website_ptsp_baubau'
+                source: 'website_ptsp_baubau',
+                sessionId: sessionId // Tambahkan session ID
             };
             
             // Validate NIK (16 digits)
             if (formData.nik.length !== 16 || !/^\d+$/.test(formData.nik)) {
                 showNotification('NIK harus 16 digit angka', 'error');
+                isSubmitting = false;
                 return;
             }
             
             // Validate phone number
             if (formData.telepon.length < 10 || !/^\d+$/.test(formData.telepon)) {
                 showNotification('Nomor telepon tidak valid', 'error');
+                isSubmitting = false;
+                return;
+            }
+            
+            // Cek duplikasi data
+            if (isDuplicateData(formData)) {
+                showNotification('Anda sudah mendaftar untuk tanggal kunjungan ini. Silakan cek status pendaftaran.', 'warning');
+                isSubmitting = false;
                 return;
             }
             
@@ -917,34 +964,43 @@
             const barcode = generateBarcode();
             
             try {
-                // Save to Google Sheets via Apps Script
-                const serverBookingCode = await saveToGoogleSheets(formData, bookingCode);
+                // Simpan ke localStorage terlebih dahulu
+                const savedLocally = saveToLocalStorage(formData, bookingCode);
                 
-                // Display booking result
-                document.getElementById('bookingCodeDisplay').textContent = serverBookingCode || bookingCode;
-                document.getElementById('barcodeDisplay').textContent = barcode;
-                document.getElementById('bookingResult').style.display = 'block';
-                
-                // Scroll to booking result
-                document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
-                
-                // Show success message
-                showNotification('Pendaftaran berhasil! Kode booking Anda: ' + (serverBookingCode || bookingCode), 'success', 8000);
-                
-                // Reset form
-                document.getElementById('bookingForm').reset();
-                
-                // Set default date again
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+                if (savedLocally) {
+                    // Kemudian coba simpan ke Google Sheets via Apps Script
+                    const serverBookingCode = await saveToGoogleSheets(formData, bookingCode);
+                    
+                    // Display booking result
+                    document.getElementById('bookingCodeDisplay').textContent = serverBookingCode || bookingCode;
+                    document.getElementById('barcodeDisplay').textContent = barcode;
+                    document.getElementById('bookingResult').style.display = 'block';
+                    
+                    // Scroll to booking result
+                    document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Show success message
+                    showNotification('Pendaftaran berhasil! Kode booking Anda: ' + (serverBookingCode || bookingCode), 'success', 8000);
+                    
+                    // Reset form
+                    document.getElementById('bookingForm').reset();
+                    
+                    // Set default date again
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+                    
+                } else {
+                    throw new Error('Gagal menyimpan data lokal');
+                }
                 
             } catch (error) {
                 console.error('Error during form submission:', error);
                 showNotification('Terjadi kesalahan: ' + error.message, 'error');
             } finally {
-                // Hide loading
+                // Hide loading dan reset flag
                 showLoading(false);
+                isSubmitting = false;
             }
         });
         
@@ -958,67 +1014,77 @@
                     ...formData,
                     bookingCode: bookingCode,
                     action: 'submitBooking',
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    sessionId: sessionId
                 };
                 
                 console.log('Payload:', payload);
                 
-                // Kirim data ke Google Apps Script menggunakan fetch dengan no-cors mode
-                // karena Apps Script tidak mendukung CORS untuk web apps
+                // Kirim data ke Google Apps Script
+                // Catatan: Mode 'no-cors' hanya untuk request sederhana
+                // Untuk membaca response, gunakan fetch dengan proxy atau modifikasi CORS di Apps Script
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Mode no-cors untuk menghindari CORS error
+                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: new URLSearchParams(payload).toString()
                 });
                 
-                // Karena mode no-cors, kita tidak bisa membaca response
-                // Jadi kita anggap berhasil jika tidak ada error
                 console.log('Data terkirim ke server');
-                
-                // Simpan juga ke localStorage sebagai backup
-                saveToLocalStorage(formData, bookingCode);
                 
                 return bookingCode;
                 
             } catch (error) {
                 console.error('Error menyimpan ke Google Sheets:', error);
-                
-                // Simpan ke localStorage sebagai backup
-                saveToLocalStorage(formData, bookingCode);
-                
-                showNotification('Data disimpan secara lokal. Akan disinkronkan nanti.', 'warning');
-                
+                // Tetap return bookingCode karena sudah disimpan di localStorage
                 return bookingCode;
             }
         }
         
-        // Fungsi untuk menyimpan ke localStorage sebagai backup
+        // Fungsi untuk menyimpan ke localStorage
         function saveToLocalStorage(formData, bookingCode) {
             try {
-                // Get existing bookings or initialize empty array
+                // Get existing bookings
                 const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                
+                // Cek apakah data sudah ada (berdasarkan NIK dan tanggal)
+                const isDuplicate = bookings.some(booking => 
+                    booking.nik === formData.nik && 
+                    booking.tanggal === formData.tanggal &&
+                    booking.namaWbp === formData.namaWbp
+                );
+                
+                if (isDuplicate) {
+                    console.log('Data duplikat ditemukan, tidak disimpan lagi');
+                    return true; // Tetap return true karena data sudah ada
+                }
                 
                 const bookingRecord = {
                     ...formData,
                     bookingCode: bookingCode,
                     savedAt: new Date().toISOString(),
-                    synced: false // Mark as not synced with server
+                    synced: false,
+                    sessionId: sessionId
                 };
                 
                 // Add new booking
                 bookings.push(bookingRecord);
                 
-                // Save to localStorage
-                localStorage.setItem('ptspBookings', JSON.stringify(bookings));
+                // Simpan ke localStorage (maksimal 50 data)
+                const maxRecords = 50;
+                const trimmedBookings = bookings.slice(-maxRecords);
+                
+                localStorage.setItem('ptspBookings', JSON.stringify(trimmedBookings));
                 
                 console.log('Data disimpan di localStorage:', bookingRecord);
+                return true;
                 
             } catch (error) {
                 console.error('Gagal menyimpan ke localStorage:', error);
                 showNotification('Gagal menyimpan data lokal', 'error');
+                return false;
             }
         }
         
@@ -1032,16 +1098,26 @@
                 
                 console.log('Mencoba sync data lokal:', unsynced.length, 'record');
                 
-                // Try to sync each unsynced record
-                for (let i = 0; i < unsynced.length; i++) {
-                    const booking = unsynced[i];
-                    
+                // Sync hanya data yang lebih dari 30 detik yang lalu (hindari data baru)
+                const now = new Date();
+                const oldUnsynced = unsynced.filter(record => 
+                    (now - new Date(record.savedAt)) > 30000
+                );
+                
+                if (oldUnsynced.length === 0) {
+                    console.log('Tidak ada data lama yang perlu disinkronkan');
+                    return;
+                }
+                
+                // Try to sync each old unsynced record
+                for (const booking of oldUnsynced) {
                     try {
                         // Prepare payload
                         const payload = {
                             ...booking,
                             action: 'submitBooking',
-                            timestamp: new Date().toISOString()
+                            timestamp: new Date().toISOString(),
+                            isSync: true // Flag untuk sinkronisasi
                         };
                         
                         // Try to send to server
@@ -1054,11 +1130,16 @@
                             body: new URLSearchParams(payload).toString()
                         });
                         
-                        // Mark as synced
-                        booking.synced = true;
-                        bookings[i + (bookings.length - unsynced.length)] = booking;
+                        // Update lokal: tandai sebagai synced
+                        const index = bookings.findIndex(b => 
+                            b.bookingCode === booking.bookingCode && 
+                            b.savedAt === booking.savedAt
+                        );
                         
-                        console.log('Record synced:', booking.bookingCode);
+                        if (index !== -1) {
+                            bookings[index].synced = true;
+                            console.log('Record synced:', booking.bookingCode);
+                        }
                         
                     } catch (error) {
                         console.error('Gagal sync record:', booking.bookingCode, error);
@@ -1068,8 +1149,13 @@
                 // Update localStorage
                 localStorage.setItem('ptspBookings', JSON.stringify(bookings));
                 
-                if (unsynced.some(b => b.synced)) {
-                    showNotification('Data lokal berhasil disinkronkan dengan server', 'success');
+                // Hanya tampilkan notifikasi jika ada yang berhasil disinkronkan
+                const syncedCount = bookings.filter(b => b.synced).length;
+                const previouslySynced = JSON.parse(localStorage.getItem('lastSyncedCount') || '0');
+                
+                if (syncedCount > previouslySynced) {
+                    showNotification(`Berhasil menyinkronkan ${syncedCount - previouslySynced} data ke server`, 'success');
+                    localStorage.setItem('lastSyncedCount', syncedCount.toString());
                 }
                 
             } catch (error) {
@@ -1111,40 +1197,15 @@
                     return;
                 }
                 
-                // Jika tidak ditemukan di lokal, coba dari server
-                showNotification('Mengecek status dari server...', 'info');
-                
-                // Query server for status
-                const response = await fetch(`${SCRIPT_URL}?action=getBookingStatus&bookingCode=${encodeURIComponent(kode)}`);
-                
-                if (!response.ok) {
-                    throw new Error('Gagal mengambil data dari server');
-                }
-                
-                const result = await response.json();
-                
-                if (result.found) {
-                    statusResult.innerHTML = `
-                        <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border: 1px solid #c3e6cb;">
-                            <h4 style="margin-top: 0; color: #155724;"><i class="fas fa-check-circle"></i> Data Ditemukan (Server)</h4>
-                            <p><strong>Kode Booking:</strong> ${result.bookingCode}</p>
-                            <p><strong>Nama:</strong> ${result.nama}</p>
-                            <p><strong>Tanggal Kunjungan:</strong> ${result.tanggalKunjungan}</p>
-                            <p><strong>Status:</strong> <span style="color: #155724; background-color: #c3e6cb; padding: 2px 8px; border-radius: 3px;">${result.status || 'TERDAFTAR'}</span></p>
-                            <p><strong>Tanggal Daftar:</strong> ${result.tanggalDaftar}</p>
-                        </div>
-                    `;
-                    statusResult.style.display = 'block';
-                } else {
-                    statusResult.innerHTML = `
-                        <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
-                            <h4 style="margin-top: 0; color: #721c24;"><i class="fas fa-exclamation-circle"></i> Data Tidak Ditemukan</h4>
-                            <p>Kode booking <strong>${kode}</strong> tidak ditemukan dalam sistem.</p>
-                            <p>Pastikan kode booking yang dimasukkan benar.</p>
-                        </div>
-                    `;
-                    statusResult.style.display = 'block';
-                }
+                // Jika tidak ditemukan di lokal, tampilkan pesan
+                statusResult.innerHTML = `
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                        <h4 style="margin-top: 0; color: #721c24;"><i class="fas fa-exclamation-circle"></i> Data Tidak Ditemukan</h4>
+                        <p>Kode booking <strong>${kode}</strong> tidak ditemukan dalam sistem.</p>
+                        <p>Pastikan kode booking yang dimasukkan benar.</p>
+                    </div>
+                `;
+                statusResult.style.display = 'block';
                 
             } catch (error) {
                 console.error('Error checking status:', error);
@@ -1197,10 +1258,8 @@
             });
         });
         
-        // Initialize localStorage if empty
-        if (!localStorage.getItem('ptspBookings')) {
-            localStorage.setItem('ptspBookings', JSON.stringify([]));
-        }
+        // Set interval untuk sinkronisasi data (setiap 2 menit)
+        setInterval(trySyncLocalData, 120000);
     </script>
 </body>
 </html>
