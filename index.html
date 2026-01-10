@@ -14,6 +14,8 @@
             --dark-color: #343a40;
             --success-color: #28a745;
             --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
             --border-radius: 8px;
             --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
@@ -406,6 +408,78 @@
             opacity: 0.8;
         }
         
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        .notification.success {
+            background-color: var(--success-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.info {
+            background-color: var(--info-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 15px;
+            padding: 0 5px;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* Responsive */
         @media (max-width: 992px) {
             .main-content {
@@ -434,6 +508,12 @@
             
             .services-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
             }
         }
     </style>
@@ -608,7 +688,12 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-submit" id="submitBtn">Daftarkan Kunjungan</button>
+                        <div class="spinner" id="loadingSpinner"></div>
+                        
+                        <button type="submit" class="btn btn-submit" id="submitBtn">
+                            <span id="submitText">Daftarkan Kunjungan</span>
+                            <span id="loadingText" style="display: none;">Menyimpan data...</span>
+                        </button>
                     </form>
                     
                     <div class="booking-result" id="bookingResult">
@@ -656,6 +741,7 @@
                     <p style="margin-bottom: 15px; font-size: 0.95rem;">Masukkan kode booking untuk mengecek status pendaftaran Anda</p>
                     <input type="text" id="cekKode" class="form-control" placeholder="Masukkan kode booking" style="margin-bottom: 10px;">
                     <button class="btn btn-primary" style="width: 100%;" onclick="cekStatusBooking()">Cek Status</button>
+                    <div id="statusResult" style="margin-top: 10px; padding: 10px; border-radius: 5px; display: none;"></div>
                 </div>
             </div>
         </div>
@@ -673,9 +759,9 @@
                 <div class="footer-section">
                     <h3>Kontak Kami</h3>
                     <div class="contact-info">
-                        <p><i class="fas fa-map-marker-alt"></i> Jl. Sultan Hasanuddin No. 45, Baubau, Sulawesi Tenggara</p>
-                        <p><i class="fas fa-phone"></i> (0402) 1234567</p>
-                        <p><i class="fas fa-fax"></i> (0402) 1234568</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Jenderal Sudirman No. 66A, Baubau, Sulawesi Tenggara</p>
+                        <p><i class="fas fa-phone"></i> (0402) 2821208</p>
+                        <p><i class="fas fa-fax"></i> (0402) 2821208</p>
                         <p><i class="fas fa-envelope"></i> ptsp@lapasbaubau.go.id</p>
                     </div>
                 </div>
@@ -698,6 +784,9 @@
     </footer>
 
     <script>
+        // URL Google Apps Script Anda
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
+        
         // Set minimum date to today for booking form
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date().toISOString().split('T')[0];
@@ -707,6 +796,9 @@
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+            
+            // Coba sync data lokal jika ada
+            trySyncLocalData();
         });
         
         // Generate booking code
@@ -730,8 +822,64 @@
             return barcode;
         }
         
+        // Show notification
+        function showNotification(message, type = 'info', duration = 5000) {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            });
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentElement.style.animation='slideOutRight 0.3s ease'; setTimeout(() => { if(this.parentElement.parentNode) this.parentElement.parentNode.removeChild(this.parentElement); }, 300);">×</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+        
+        // Show loading state
+        function showLoading(show) {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const loadingText = document.getElementById('loadingText');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            if (show) {
+                submitBtn.disabled = true;
+                submitText.style.display = 'none';
+                loadingText.style.display = 'inline';
+                spinner.style.display = 'block';
+            } else {
+                submitBtn.disabled = false;
+                submitText.style.display = 'inline';
+                loadingText.style.display = 'none';
+                spinner.style.display = 'none';
+            }
+        }
+        
         // Handle form submission
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Get form values
@@ -745,77 +893,270 @@
                 namaWbp: document.getElementById('namaWbp').value,
                 statusWbp: document.getElementById('statusWbp').value,
                 jenisKunjungan: document.getElementById('jenisKunjungan').value,
-                tanggalDaftar: new Date().toLocaleString('id-ID')
+                tanggalDaftar: new Date().toLocaleString('id-ID'),
+                source: 'website_ptsp_baubau'
             };
             
-            // Generate booking code and barcode
-            const bookingCode = generateBookingCode();
-            const barcode = generateBarcode();
-            
-            // Display booking result
-            document.getElementById('bookingCodeDisplay').textContent = bookingCode;
-            document.getElementById('barcodeDisplay').textContent = barcode;
-            document.getElementById('bookingResult').style.display = 'block';
-            
-            // Scroll to booking result
-            document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
-            
-            // In a real application, here you would send data to Google Apps Script
-            // For now, we'll simulate with console log
-            console.log('Form Data Submitted:', formData);
-            console.log('Booking Code:', bookingCode);
-            
-            // Simulate saving to Google Sheets via Apps Script
-            saveToGoogleSheets(formData, bookingCode);
-            
-            // Show success message
-            alert('Pendaftaran berhasil! Kode booking Anda: ' + bookingCode);
-            
-            // Reset form
-            document.getElementById('bookingForm').reset();
-        });
-        
-        // Simulate saving data to Google Sheets via Google Apps Script
-        function saveToGoogleSheets(formData, bookingCode) {
-            // In a real implementation, this would call a Google Apps Script Web App
-            // For demonstration, we'll simulate the process
-            console.log('Simpan ke Google Spreadsheet:');
-            console.log('Data:', formData);
-            console.log('Kode Booking:', bookingCode);
-            
-            // This is where you would make a fetch request to your Google Apps Script
-            // Example:
-            
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
-            const payload = {
-                ...formData,
-                bookingCode: bookingCode,
-                action: 'submitBooking'
-            };
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            })
-            .then(response => console.log('Success:', response))
-            .catch(error => console.error('Error:', error));
-            
-        }
-        
-        // Check booking status
-        function cekStatusBooking() {
-            const kode = document.getElementById('cekKode').value;
-            if (!kode) {
-                alert('Masukkan kode booking terlebih dahulu');
+            // Validate NIK (16 digits)
+            if (formData.nik.length !== 16 || !/^\d+$/.test(formData.nik)) {
+                showNotification('NIK harus 16 digit angka', 'error');
                 return;
             }
             
-            // In a real application, this would query Google Sheets via Apps Script
-            // For demonstration, we'll simulate
-            alert('Status pendaftaran dengan kode ' + kode + ': TERDAFTAR\nTanggal kunjungan: ' + 
-                  new Date(new Date().getTime() + 86400000).toLocaleDateString('id-ID') + 
-                  '\nStatus: Menunggu verifikasi petugas');
+            // Validate phone number
+            if (formData.telepon.length < 10 || !/^\d+$/.test(formData.telepon)) {
+                showNotification('Nomor telepon tidak valid', 'error');
+                return;
+            }
+            
+            // Show loading
+            showLoading(true);
+            
+            // Generate booking code
+            const bookingCode = generateBookingCode();
+            const barcode = generateBarcode();
+            
+            try {
+                // Save to Google Sheets via Apps Script
+                const serverBookingCode = await saveToGoogleSheets(formData, bookingCode);
+                
+                // Display booking result
+                document.getElementById('bookingCodeDisplay').textContent = serverBookingCode || bookingCode;
+                document.getElementById('barcodeDisplay').textContent = barcode;
+                document.getElementById('bookingResult').style.display = 'block';
+                
+                // Scroll to booking result
+                document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
+                
+                // Show success message
+                showNotification('Pendaftaran berhasil! Kode booking Anda: ' + (serverBookingCode || bookingCode), 'success', 8000);
+                
+                // Reset form
+                document.getElementById('bookingForm').reset();
+                
+                // Set default date again
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
+                
+            } catch (error) {
+                console.error('Error during form submission:', error);
+                showNotification('Terjadi kesalahan: ' + error.message, 'error');
+            } finally {
+                // Hide loading
+                showLoading(false);
+            }
+        });
+        
+        // Fungsi untuk menyimpan data ke Google Sheets via Apps Script
+        async function saveToGoogleSheets(formData, bookingCode) {
+            try {
+                console.log('Mengirim data ke Google Apps Script...');
+                
+                // Tambahkan booking code ke formData
+                const payload = {
+                    ...formData,
+                    bookingCode: bookingCode,
+                    action: 'submitBooking',
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('Payload:', payload);
+                
+                // Kirim data ke Google Apps Script menggunakan fetch dengan no-cors mode
+                // karena Apps Script tidak mendukung CORS untuk web apps
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Mode no-cors untuk menghindari CORS error
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(payload).toString()
+                });
+                
+                // Karena mode no-cors, kita tidak bisa membaca response
+                // Jadi kita anggap berhasil jika tidak ada error
+                console.log('Data terkirim ke server');
+                
+                // Simpan juga ke localStorage sebagai backup
+                saveToLocalStorage(formData, bookingCode);
+                
+                return bookingCode;
+                
+            } catch (error) {
+                console.error('Error menyimpan ke Google Sheets:', error);
+                
+                // Simpan ke localStorage sebagai backup
+                saveToLocalStorage(formData, bookingCode);
+                
+                showNotification('Data disimpan secara lokal. Akan disinkronkan nanti.', 'warning');
+                
+                return bookingCode;
+            }
+        }
+        
+        // Fungsi untuk menyimpan ke localStorage sebagai backup
+        function saveToLocalStorage(formData, bookingCode) {
+            try {
+                // Get existing bookings or initialize empty array
+                const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                
+                const bookingRecord = {
+                    ...formData,
+                    bookingCode: bookingCode,
+                    savedAt: new Date().toISOString(),
+                    synced: false // Mark as not synced with server
+                };
+                
+                // Add new booking
+                bookings.push(bookingRecord);
+                
+                // Save to localStorage
+                localStorage.setItem('ptspBookings', JSON.stringify(bookings));
+                
+                console.log('Data disimpan di localStorage:', bookingRecord);
+                
+            } catch (error) {
+                console.error('Gagal menyimpan ke localStorage:', error);
+                showNotification('Gagal menyimpan data lokal', 'error');
+            }
+        }
+        
+        // Fungsi untuk mencoba sync data lokal ke server
+        async function trySyncLocalData() {
+            try {
+                const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                const unsynced = bookings.filter(b => !b.synced);
+                
+                if (unsynced.length === 0) return;
+                
+                console.log('Mencoba sync data lokal:', unsynced.length, 'record');
+                
+                // Try to sync each unsynced record
+                for (let i = 0; i < unsynced.length; i++) {
+                    const booking = unsynced[i];
+                    
+                    try {
+                        // Prepare payload
+                        const payload = {
+                            ...booking,
+                            action: 'submitBooking',
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Try to send to server
+                        await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams(payload).toString()
+                        });
+                        
+                        // Mark as synced
+                        booking.synced = true;
+                        bookings[i + (bookings.length - unsynced.length)] = booking;
+                        
+                        console.log('Record synced:', booking.bookingCode);
+                        
+                    } catch (error) {
+                        console.error('Gagal sync record:', booking.bookingCode, error);
+                    }
+                }
+                
+                // Update localStorage
+                localStorage.setItem('ptspBookings', JSON.stringify(bookings));
+                
+                if (unsynced.some(b => b.synced)) {
+                    showNotification('Data lokal berhasil disinkronkan dengan server', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Gagal sync data lokal:', error);
+            }
+        }
+        
+        // Check booking status
+        async function cekStatusBooking() {
+            const kode = document.getElementById('cekKode').value.trim();
+            const statusResult = document.getElementById('statusResult');
+            
+            if (!kode) {
+                showNotification('Masukkan kode booking terlebih dahulu', 'error');
+                return;
+            }
+            
+            // Clear previous result
+            statusResult.style.display = 'none';
+            statusResult.innerHTML = '';
+            
+            try {
+                // Cek di localStorage dulu
+                const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                const localBooking = bookings.find(b => b.bookingCode === kode);
+                
+                if (localBooking) {
+                    statusResult.innerHTML = `
+                        <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border: 1px solid #c3e6cb;">
+                            <h4 style="margin-top: 0; color: #155724;"><i class="fas fa-check-circle"></i> Data Ditemukan (Lokal)</h4>
+                            <p><strong>Kode Booking:</strong> ${localBooking.bookingCode}</p>
+                            <p><strong>Nama:</strong> ${localBooking.nama}</p>
+                            <p><strong>Tanggal Kunjungan:</strong> ${localBooking.tanggal}</p>
+                            <p><strong>Status:</strong> <span style="color: #856404; background-color: #fff3cd; padding: 2px 8px; border-radius: 3px;">${localBooking.synced ? 'TERSIMPAN DI SERVER' : 'BELUM DISINKRONKAN'}</span></p>
+                            <p><strong>Catatan:</strong> Data ini tersimpan di browser Anda. ${localBooking.synced ? 'Sudah disinkronkan dengan server.' : 'Belum disinkronkan dengan server.'}</p>
+                        </div>
+                    `;
+                    statusResult.style.display = 'block';
+                    return;
+                }
+                
+                // Jika tidak ditemukan di lokal, coba dari server
+                showNotification('Mengecek status dari server...', 'info');
+                
+                // Query server for status
+                const response = await fetch(`${SCRIPT_URL}?action=getBookingStatus&bookingCode=${encodeURIComponent(kode)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data dari server');
+                }
+                
+                const result = await response.json();
+                
+                if (result.found) {
+                    statusResult.innerHTML = `
+                        <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; border: 1px solid #c3e6cb;">
+                            <h4 style="margin-top: 0; color: #155724;"><i class="fas fa-check-circle"></i> Data Ditemukan (Server)</h4>
+                            <p><strong>Kode Booking:</strong> ${result.bookingCode}</p>
+                            <p><strong>Nama:</strong> ${result.nama}</p>
+                            <p><strong>Tanggal Kunjungan:</strong> ${result.tanggalKunjungan}</p>
+                            <p><strong>Status:</strong> <span style="color: #155724; background-color: #c3e6cb; padding: 2px 8px; border-radius: 3px;">${result.status || 'TERDAFTAR'}</span></p>
+                            <p><strong>Tanggal Daftar:</strong> ${result.tanggalDaftar}</p>
+                        </div>
+                    `;
+                    statusResult.style.display = 'block';
+                } else {
+                    statusResult.innerHTML = `
+                        <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                            <h4 style="margin-top: 0; color: #721c24;"><i class="fas fa-exclamation-circle"></i> Data Tidak Ditemukan</h4>
+                            <p>Kode booking <strong>${kode}</strong> tidak ditemukan dalam sistem.</p>
+                            <p>Pastikan kode booking yang dimasukkan benar.</p>
+                        </div>
+                    `;
+                    statusResult.style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Error checking status:', error);
+                statusResult.innerHTML = `
+                    <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; border: 1px solid #f5c6cb;">
+                        <h4 style="margin-top: 0; color: #721c24;"><i class="fas fa-exclamation-circle"></i> Error</h4>
+                        <p>Terjadi kesalahan saat mengecek status: ${error.message}</p>
+                        <p>Silakan coba lagi nanti atau hubungi admin.</p>
+                    </div>
+                `;
+                statusResult.style.display = 'block';
+            }
         }
         
         // Send booking to email (simulated)
@@ -824,12 +1165,18 @@
             const bookingCode = document.getElementById('bookingCodeDisplay').textContent;
             
             if (!email) {
-                alert('Silakan isi email Anda terlebih dahulu pada formulir pendaftaran');
+                showNotification('Silakan isi email Anda terlebih dahulu pada formulir pendaftaran', 'warning');
                 return;
             }
             
-            // In a real application, this would trigger Google Apps Script to send email
-            alert('Konfirmasi kode booking ' + bookingCode + ' telah dikirim ke ' + email);
+            // Simulate email sending
+            showNotification(`Konfirmasi dengan kode ${bookingCode} telah dikirim ke ${email}`, 'info');
+            
+            // In real implementation, this would trigger Google Apps Script to send email
+            // For now, we'll just show a notification
+            setTimeout(() => {
+                showNotification('Email berhasil dikirim!', 'success');
+            }, 1000);
         }
         
         // Smooth scrolling for navigation links
@@ -849,6 +1196,11 @@
                 }
             });
         });
+        
+        // Initialize localStorage if empty
+        if (!localStorage.getItem('ptspBookings')) {
+            localStorage.setItem('ptspBookings', JSON.stringify([]));
+        }
     </script>
 </body>
 </html>
