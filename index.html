@@ -136,6 +136,18 @@
             color: var(--primary-color);
         }
         
+        /* Session Warning */
+        .session-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
         /* Hero Section */
         .hero {
             padding: 80px 0;
@@ -517,6 +529,19 @@
             color: #721c24;
         }
         
+        /* Previous Submission Button */
+        #showPreviousBtn {
+            animation: pulse 2s infinite;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         /* Footer */
         footer {
             background: var(--dark-color);
@@ -634,7 +659,8 @@
         
         /* Print Styles */
         @media print {
-            header, nav, .sidebar, footer, .btn, .action-buttons {
+            header, nav, .sidebar, footer, .btn, .action-buttons,
+            .session-warning, #showPreviousBtn {
                 display: none !important;
             }
             
@@ -730,6 +756,11 @@
         </div>
     </header>
 
+    <!-- Session Warning (akan muncul jika sudah submit) -->
+    <div id="sessionWarning" class="container session-warning" style="display: none;">
+        <p><i class="fas fa-info-circle"></i> Anda sudah mendaftar dalam sesi ini. Jika ingin mendaftar lagi, klik tombol "Mulai Sesi Baru" di sidebar.</p>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -784,7 +815,12 @@
                 <!-- Booking Form Section -->
                 <section class="card" id="booking">
                     <h2 class="card-title">Formulir Pendaftaran Kunjungan</h2>
-                    <p class="mb-30">Isi data dengan benar untuk mendapatkan kode booking dan QR Code verifikasi.</p>
+                    <p class="mb-30">Isi data dengan benar untuk mendapatkan kode booking dan QR Code verifikasi. <strong style="color: var(--danger-color);">Hanya bisa submit sekali per sesi.</strong></p>
+                    
+                    <!-- Previous Submission Button (akan muncul jika sudah submit) -->
+                    <button id="showPreviousBtn" class="btn btn-primary" style="display: none; margin-bottom: 20px;">
+                        <i class="fas fa-history"></i> Lihat Pendaftaran Sebelumnya
+                    </button>
                     
                     <form id="bookingForm">
                         <div class="form-row">
@@ -794,14 +830,14 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">NIK (16 digit) <span style="color: var(--danger-color)">*</span></label>
-                                <input type="text" id="nik" class="form-control" required maxlength="16">
+                                <input type="text" id="nik" class="form-control" required maxlength="16" pattern="\d{16}" title="Harus 16 digit angka">
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">No. Telepon <span style="color: var(--danger-color)">*</span></label>
-                                <input type="tel" id="telepon" class="form-control" required>
+                                <input type="tel" id="telepon" class="form-control" required pattern="\d{10,15}" title="10-15 digit angka">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Email</label>
@@ -830,7 +866,7 @@
                         
                         <div class="form-group">
                             <label class="form-label">Nama WBP <span style="color: var(--danger-color)">*</span></label>
-                            <input type="text" id="namaWbp" class="form-control" required>
+                            <input type="text" id="namaWbp" class="form-control" required minlength="3">
                         </div>
                         
                         <div class="form-row">
@@ -859,6 +895,12 @@
                             <span id="submitText">Kirim Pendaftaran</span>
                             <span id="loadingText" style="display: none;">Memproses...</span>
                         </button>
+                        
+                        <div class="text-center mt-20">
+                            <small style="color: #666;">
+                                <i class="fas fa-info-circle"></i> Data hanya akan tersimpan sekali per sesi. Refresh halaman tidak akan membuat data duplikat.
+                            </small>
+                        </div>
                     </form>
                     
                     <!-- Booking Result -->
@@ -926,6 +968,11 @@
                             
                             <!-- Booking Details -->
                             <div id="bookingDetails" class="mt-30"></div>
+                            
+                            <!-- Session Info -->
+                            <div class="text-center mt-30" style="color: #666; font-size: 0.9rem;">
+                                <i class="fas fa-shield-alt"></i> Data tersimpan dengan aman. Tidak akan duplikat meski halaman di-refresh.
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -982,6 +1029,22 @@
                     </ul>
                 </div>
                 
+                <!-- Session Management -->
+                <div class="sidebar-card" id="sessionManagementCard">
+                    <h3 class="sidebar-title"><i class="fas fa-redo"></i> Mulai Sesi Baru</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
+                        Jika ingin mendaftar lagi dalam sesi yang sama.
+                    </p>
+                    <button class="btn btn-primary" onclick="clearAndStartNewSession()" style="width: 100%;" id="newSessionBtn">
+                        <i class="fas fa-plus-circle"></i> Daftar Lagi
+                    </button>
+                    <div class="text-center mt-15">
+                        <small style="color: #888;">
+                            <i class="fas fa-user-clock"></i> Sesi aktif: <span id="sessionTimer">0m 0s</span>
+                        </small>
+                    </div>
+                </div>
+                
                 <!-- Status Check -->
                 <div class="sidebar-card">
                     <h3 class="sidebar-title"><i class="fas fa-search"></i> Cek Status Pendaftaran</h3>
@@ -1001,14 +1064,14 @@
                 <div class="sidebar-card">
                     <h3 class="sidebar-title"><i class="fas fa-link"></i> Link Cepat</h3>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <a href="#services" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                        <a href="#services" class="btn btn-outline" style="text-align: left; justify-content: flex-start; color: var(--primary-color); border-color: var(--primary-color);">
                             <i class="fas fa-concierge-bell"></i> Layanan
                         </a>
-                        <a href="#booking" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                        <a href="#booking" class="btn btn-outline" style="text-align: left; justify-content: flex-start; color: var(--primary-color); border-color: var(--primary-color);">
                             <i class="fas fa-calendar-plus"></i> Pendaftaran
                         </a>
-                        <button class="btn btn-outline" onclick="window.print()" style="text-align: left; justify-content: flex-start;">
-                            <i class="fas fa-print"></i> Cetak
+                        <button class="btn btn-outline" onclick="window.print()" style="text-align: left; justify-content: flex-start; color: var(--primary-color); border-color: var(--primary-color);">
+                            <i class="fas fa-print"></i> Cetak Tiket
                         </button>
                     </div>
                 </div>
@@ -1040,7 +1103,7 @@
                         <a href="#services"><i class="fas fa-chevron-right"></i> Layanan WBP</a>
                         <a href="#booking"><i class="fas fa-chevron-right"></i> Pendaftaran Online</a>
                         <a href="#" onclick="window.print()"><i class="fas fa-chevron-right"></i> Cetak Tiket</a>
-                        <a href="#status-check"><i class="fas fa-chevron-right"></i> Cek Status</a>
+                        <a href="javascript:void(0)" onclick="cekStatusBooking()"><i class="fas fa-chevron-right"></i> Cek Status</a>
                     </div>
                 </div>
             </div>
@@ -1058,9 +1121,21 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec'; // GANTI DENGAN URL APPS SCRIPT ANDA
         
         // ============================================
+        // VARIABEL GLOBAL
+        // ============================================
+        let formSubmitted = false;
+        let sessionTimerInterval = null;
+        let currentSessionId = null;
+        
+        // ============================================
         // INISIALISASI
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Sistem PTSP Lapas Baubau dimuat...');
+            
+            // Inisialisasi session
+            initializeSession();
+            
             // Set tanggal minimal hari ini
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('tanggal').min = today;
@@ -1070,11 +1145,168 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
             
+            // Cek jika sudah submit dalam session ini
+            checkPreviousSubmission();
+            
+            // Mulai timer session
+            startSessionTimer();
+            
             // Test koneksi ke server
             testConnection();
             
             console.log('Sistem PTSP Lapas Baubau siap digunakan!');
         });
+        
+        // ============================================
+        // SESSION MANAGEMENT - MENCEGAH DUPLIKASI
+        // ============================================
+        
+        // Generate unique session ID
+        function generateSessionId() {
+            return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Initialize session
+        function initializeSession() {
+            let sessionId = localStorage.getItem('currentSessionId');
+            
+            // Generate new session ID jika belum ada
+            if (!sessionId) {
+                sessionId = generateSessionId();
+                localStorage.setItem('currentSessionId', sessionId);
+                localStorage.setItem('sessionCreated', new Date().toISOString());
+                console.log('Session baru dibuat:', sessionId);
+            } else {
+                // Cek jika session sudah expired (24 jam)
+                const sessionCreated = localStorage.getItem('sessionCreated');
+                if (sessionCreated) {
+                    const createdDate = new Date(sessionCreated);
+                    const now = new Date();
+                    const hoursDiff = (now - createdDate) / (1000 * 60 * 60);
+                    
+                    if (hoursDiff > 24) {
+                        // Session expired, buat baru
+                        sessionId = generateSessionId();
+                        localStorage.setItem('currentSessionId', sessionId);
+                        localStorage.setItem('sessionCreated', new Date().toISOString());
+                        localStorage.removeItem('lastSubmission');
+                        localStorage.removeItem('lastBookingCode');
+                        console.log('Session expired, dibuat baru:', sessionId);
+                    }
+                }
+            }
+            
+            currentSessionId = sessionId;
+            return sessionId;
+        }
+        
+        // Cek apakah sudah submit dalam session ini
+        function hasSubmittedInThisSession() {
+            const sessionId = localStorage.getItem('currentSessionId');
+            const lastSubmission = localStorage.getItem('lastSubmission');
+            
+            if (!sessionId || !lastSubmission) return false;
+            
+            try {
+                const submission = JSON.parse(lastSubmission);
+                return submission.sessionId === sessionId && submission.submitted === true;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        // Cek submission sebelumnya
+        function checkPreviousSubmission() {
+            if (hasSubmittedInThisSession()) {
+                const lastSubmission = JSON.parse(localStorage.getItem('lastSubmission') || '{}');
+                
+                // Tampilkan warning
+                document.getElementById('sessionWarning').style.display = 'block';
+                
+                // Tampilkan button untuk lihat hasil sebelumnya
+                if (lastSubmission.bookingCode) {
+                    document.getElementById('showPreviousBtn').style.display = 'block';
+                    document.getElementById('showPreviousBtn').onclick = function() {
+                        loadPreviousSubmission(lastSubmission.bookingCode);
+                    };
+                    
+                    // Update text button
+                    document.getElementById('newSessionBtn').innerHTML = '<i class="fas fa-plus-circle"></i> Daftar Lagi (' + lastSubmission.bookingCode + ')';
+                }
+                
+                // Disable submit button
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-check"></i> Sudah Didaftarkan';
+                
+                console.log('User sudah submit dalam session ini:', lastSubmission.bookingCode);
+            }
+        }
+        
+        // Mark session as submitted
+        function markSessionAsSubmitted(bookingCode, data) {
+            const sessionId = localStorage.getItem('currentSessionId');
+            const submissionData = {
+                sessionId: sessionId,
+                submitted: true,
+                bookingCode: bookingCode,
+                timestamp: new Date().toISOString(),
+                nama: data.nama,
+                nik: data.nik,
+                tanggal: data.tanggal
+            };
+            
+            localStorage.setItem('lastSubmission', JSON.stringify(submissionData));
+            localStorage.setItem('lastBookingCode', bookingCode);
+            
+            // Update UI
+            document.getElementById('sessionWarning').style.display = 'block';
+            document.getElementById('showPreviousBtn').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-check"></i> Sudah Didaftarkan';
+            
+            console.log('Session marked as submitted:', bookingCode);
+        }
+        
+        // Clear session data
+        function clearSessionSubmission() {
+            localStorage.removeItem('lastSubmission');
+            localStorage.removeItem('lastBookingCode');
+            
+            // Update UI
+            document.getElementById('sessionWarning').style.display = 'none';
+            document.getElementById('showPreviousBtn').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Kirim Pendaftaran';
+            document.getElementById('newSessionBtn').innerHTML = '<i class="fas fa-plus-circle"></i> Daftar Lagi';
+            
+            console.log('Session submission cleared');
+        }
+        
+        // Start session timer
+        function startSessionTimer() {
+            const sessionCreated = localStorage.getItem('sessionCreated');
+            if (!sessionCreated) return;
+            
+            function updateTimer() {
+                const createdDate = new Date(sessionCreated);
+                const now = new Date();
+                const diffMs = now - createdDate;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const remainingMins = diffMins % 60;
+                
+                document.getElementById('sessionTimer').textContent = 
+                    `${diffHours > 0 ? diffHours + 'j ' : ''}${remainingMins}m`;
+                
+                // Jika lebih dari 24 jam, reset session
+                if (diffHours >= 24) {
+                    initializeSession();
+                }
+            }
+            
+            updateTimer();
+            sessionTimerInterval = setInterval(updateTimer, 60000); // Update setiap menit
+        }
         
         // ============================================
         // FUNGSI UTAMA
@@ -1157,84 +1389,8 @@
         }
         
         // ============================================
-        // FORM HANDLING
+        // FORM VALIDATION & SUBMISSION
         // ============================================
-        
-        // Handle form submission
-        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Validasi form
-            if (!validateForm()) {
-                return;
-            }
-            
-            // Ambil data form
-            const formData = {
-                nama: document.getElementById('nama').value.trim(),
-                nik: document.getElementById('nik').value.trim(),
-                telepon: document.getElementById('telepon').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                hubungan: document.getElementById('hubungan').value,
-                tanggal: document.getElementById('tanggal').value,
-                namaWbp: document.getElementById('namaWbp').value.trim(),
-                statusWbp: document.getElementById('statusWbp').value,
-                jenisKunjungan: document.getElementById('jenisKunjungan').value,
-                tanggalDaftar: new Date().toLocaleString('id-ID'),
-                source: 'website_ptsp_baubau'
-            };
-            
-            // Generate booking code
-            const bookingCode = generateBookingCode();
-            
-            // Tampilkan loading
-            showLoading(true);
-            
-            try {
-                // Kirim data ke server
-                const response = await submitToServer(formData, bookingCode);
-                
-                if (response.success) {
-                    // Tampilkan hasil
-                    displayBookingResult(response, formData);
-                    
-                    // Kirim notifikasi sukses
-                    showNotification(`Pendaftaran berhasil! Kode: ${bookingCode}`, 'success', 8000);
-                    
-                    // Reset form
-                    resetForm();
-                    
-                } else {
-                    throw new Error(response.message || 'Gagal menyimpan data');
-                }
-                
-            } catch (error) {
-                console.error('Submission error:', error);
-                
-                // Fallback: Simpan di localStorage
-                const saved = saveToLocalStorage(formData, bookingCode);
-                
-                if (saved) {
-                    // Tampilkan hasil offline
-                    displayOfflineResult(bookingCode, formData);
-                    
-                    showNotification(
-                        `Data disimpan sementara (offline). Kode: ${bookingCode}. Akan dikirim otomatis saat online.`,
-                        'warning',
-                        10000
-                    );
-                    
-                    // Reset form
-                    resetForm();
-                } else {
-                    showNotification('Gagal menyimpan data. Coba lagi.', 'error');
-                }
-                
-            } finally {
-                // Sembunyikan loading
-                showLoading(false);
-            }
-        });
         
         // Validasi form
         function validateForm() {
@@ -1243,6 +1399,7 @@
             const telepon = document.getElementById('telepon').value.trim();
             const tanggal = document.getElementById('tanggal').value;
             const namaWbp = document.getElementById('namaWbp').value.trim();
+            const email = document.getElementById('email').value.trim();
             
             // Validasi NIK (16 digit angka)
             if (!/^\d{16}$/.test(nik)) {
@@ -1270,7 +1427,6 @@
             }
             
             // Validasi email (jika diisi)
-            const email = document.getElementById('email').value.trim();
             if (email && !isValidEmail(email)) {
                 showNotification('Format email tidak valid', 'error');
                 return false;
@@ -1279,13 +1435,125 @@
             return true;
         }
         
+        // Validasi email
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+        
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Set flag untuk mencegah multiple submission
+            if (formSubmitted) {
+                showNotification('Sedang memproses pendaftaran sebelumnya...', 'warning');
+                return;
+            }
+            
+            // CEK: Jika sudah submit dalam session ini
+            if (hasSubmittedInThisSession()) {
+                const lastSubmission = JSON.parse(localStorage.getItem('lastSubmission') || '{}');
+                showNotification(
+                    `Anda sudah mendaftar dalam sesi ini. Kode: ${lastSubmission.bookingCode}`,
+                    'warning',
+                    8000
+                );
+                return;
+            }
+            
+            // Validasi form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Ambil data form
+            const formData = {
+                nama: document.getElementById('nama').value.trim(),
+                nik: document.getElementById('nik').value.trim(),
+                telepon: document.getElementById('telepon').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                hubungan: document.getElementById('hubungan').value,
+                tanggal: document.getElementById('tanggal').value,
+                namaWbp: document.getElementById('namaWbp').value.trim(),
+                statusWbp: document.getElementById('statusWbp').value,
+                jenisKunjungan: document.getElementById('jenisKunjungan').value,
+                tanggalDaftar: new Date().toLocaleString('id-ID'),
+                source: 'website_ptsp_baubau',
+                sessionId: localStorage.getItem('currentSessionId')
+            };
+            
+            // Generate booking code
+            const bookingCode = generateBookingCode();
+            
+            // Tampilkan loading
+            showLoading(true);
+            formSubmitted = true;
+            
+            try {
+                // Kirim data ke server
+                const response = await submitToServer(formData, bookingCode);
+                
+                if (response.success) {
+                    // MARK SESSION: Tandai sudah submit
+                    markSessionAsSubmitted(bookingCode, formData);
+                    
+                    // Tampilkan hasil
+                    displayBookingResult(response, formData);
+                    
+                    // Reset form dengan session protection
+                    resetFormWithSessionProtection();
+                    
+                    // Kirim notifikasi sukses
+                    showNotification(`Pendaftaran berhasil! Kode: ${bookingCode}`, 'success', 8000);
+                    
+                } else {
+                    throw new Error(response.message || 'Gagal menyimpan data');
+                }
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                
+                // Fallback: Simpan di localStorage TAPI dengan session protection
+                if (!hasSubmittedInThisSession()) {
+                    const saved = saveToLocalStorage(formData, bookingCode);
+                    
+                    if (saved) {
+                        // MARK SESSION: Tandai sudah submit (offline)
+                        markSessionAsSubmitted(bookingCode, formData);
+                        
+                        // Tampilkan hasil offline
+                        displayOfflineResult(bookingCode, formData);
+                        
+                        // Reset form
+                        resetFormWithSessionProtection();
+                        
+                        showNotification(
+                            `Data disimpan sementara (offline). Kode: ${bookingCode}`,
+                            'warning',
+                            10000
+                        );
+                    } else {
+                        showNotification('Gagal menyimpan data. Coba lagi.', 'error');
+                    }
+                } else {
+                    showNotification('Anda sudah mendaftar dalam sesi ini.', 'warning');
+                }
+                
+            } finally {
+                // Reset flag dan sembunyikan loading
+                formSubmitted = false;
+                showLoading(false);
+            }
+        });
+        
         // Kirim data ke server
         async function submitToServer(formData, bookingCode) {
             const payload = new URLSearchParams({
                 ...formData,
                 bookingCode: bookingCode,
                 action: 'submitBooking',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                sessionId: formData.sessionId
             });
             
             const response = await fetch(SCRIPT_URL, {
@@ -1309,7 +1577,7 @@
         
         // Tampilkan hasil booking
         function displayBookingResult(response, formData) {
-            const bookingCode = response.bookingCode || generateBookingCode();
+            const bookingCode = response.bookingCode;
             
             // Update tampilan kode booking
             document.getElementById('bookingCodeDisplay').textContent = bookingCode;
@@ -1336,6 +1604,7 @@
                     <p><strong>Hubungan:</strong> ${formData.hubungan}</p>
                     <p><strong>No. Telepon:</strong> ${formData.telepon}</p>
                     ${formData.email ? `<p><strong>Email:</strong> ${formData.email}</p>` : ''}
+                    <p><strong>Kode Booking:</strong> <code>${bookingCode}</code></p>
                 </div>
             `;
             
@@ -1380,6 +1649,7 @@
                     <p><strong>Nama:</strong> ${formData.nama}</p>
                     <p><strong>Tanggal Kunjungan:</strong> ${formatDate(formData.tanggal)}</p>
                     <p><strong>WBP:</strong> ${formData.namaWbp}</p>
+                    <p><strong>Kode Booking:</strong> <code>${bookingCode}</code></p>
                     <p><strong>Catatan:</strong> Data akan dikirim otomatis saat koneksi pulih.</p>
                 </div>
             `;
@@ -1389,6 +1659,43 @@
             // Tampilkan hasil
             document.getElementById('bookingResult').style.display = 'block';
             document.getElementById('bookingResult').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Load previous submission
+        async function loadPreviousSubmission(bookingCode) {
+            try {
+                showNotification('Memuat data pendaftaran sebelumnya...', 'info');
+                
+                // Cek status booking
+                const response = await fetch(`${SCRIPT_URL}?action=getBookingStatus&bookingCode=${bookingCode}`);
+                const result = await response.json();
+                
+                if (result.success && result.found) {
+                    // Tampilkan data sebelumnya
+                    displayBookingResult({
+                        success: true,
+                        bookingCode: bookingCode,
+                        qrData: { bookingCode: bookingCode }
+                    }, result.data);
+                    
+                    showNotification('Data pendaftaran sebelumnya berhasil dimuat', 'success');
+                } else {
+                    // Cek di localStorage
+                    const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                    const localBooking = bookings.find(b => b.bookingCode === bookingCode);
+                    
+                    if (localBooking) {
+                        displayOfflineResult(bookingCode, localBooking);
+                        showNotification('Data ditemukan di penyimpanan lokal', 'info');
+                    } else {
+                        throw new Error('Data tidak ditemukan');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading previous:', error);
+                showNotification('Gagal memuat data sebelumnya', 'error');
+            }
         }
         
         // ============================================
@@ -1467,8 +1774,10 @@
         
         // Kirim QR Code ke email
         async function sendQRCodeToEmail() {
-            const email = document.getElementById('email').value.trim();
             const bookingCode = document.getElementById('bookingCodeDisplay').textContent;
+            
+            // Ambil email dari form atau minta input
+            let email = document.getElementById('email').value.trim();
             
             if (!email) {
                 // Minta email jika belum ada
@@ -1477,67 +1786,35 @@
                     showNotification('Email tidak valid', 'error');
                     return;
                 }
+                email = userEmail;
+            }
+            
+            showNotification(`Mengirim QR Code ke ${email}...`, 'info');
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'sendQRCodeEmail',
+                        bookingCode: bookingCode,
+                        email: email
+                    })
+                });
                 
-                // Simpan email untuk下次使用
-                document.getElementById('email').value = userEmail;
+                const result = await response.json();
                 
-                showNotification(`Mengirim QR Code ke ${userEmail}...`, 'info');
-                
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            action: 'sendQRCodeEmail',
-                            bookingCode: bookingCode,
-                            email: userEmail
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showNotification(`QR Code berhasil dikirim ke ${userEmail}`, 'success');
-                    } else {
-                        throw new Error(result.message);
-                    }
-                    
-                } catch (error) {
-                    console.error('Email error:', error);
-                    showNotification('Gagal mengirim email. Coba lagi nanti.', 'error');
+                if (result.success) {
+                    showNotification(`QR Code berhasil dikirim ke ${email}`, 'success');
+                } else {
+                    throw new Error(result.message);
                 }
                 
-            } else {
-                // Kirim ulang ke email yang sudah ada
-                showNotification(`Mengirim ulang QR Code ke ${email}...`, 'info');
-                
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            action: 'sendQRCodeEmail',
-                            bookingCode: bookingCode,
-                            email: email
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showNotification(`QR Code berhasil dikirim ulang ke ${email}`, 'success');
-                    } else {
-                        throw new Error(result.message);
-                    }
-                    
-                } catch (error) {
-                    console.error('Email error:', error);
-                    showNotification('Gagal mengirim email. Coba lagi nanti.', 'error');
-                }
+            } catch (error) {
+                console.error('Email error:', error);
+                showNotification('Gagal mengirim email. Coba lagi nanti.', 'error');
             }
         }
         
@@ -1563,18 +1840,44 @@
             }
         }
         
+        // Clear session dan mulai baru
+        function clearAndStartNewSession() {
+            if (confirm('Mulai sesi baru? Anda akan bisa mendaftar lagi, tetapi data pendaftaran sebelumnya tetap aman.')) {
+                // Clear session data
+                clearSessionSubmission();
+                
+                // Reset form
+                resetForm();
+                
+                // Hide booking result jika sedang ditampilkan
+                document.getElementById('bookingResult').style.display = 'none';
+                
+                showNotification('Sesi baru dimulai. Silakan isi formulir pendaftaran.', 'success');
+                
+                // Scroll ke form
+                document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
         // ============================================
         // STATUS CHECK
         // ============================================
         
         // Cek status booking
         async function cekStatusBooking() {
-            const kode = document.getElementById('cekKode').value.trim();
+            let kode = document.getElementById('cekKode').value.trim();
             const statusResult = document.getElementById('statusResult');
             
+            // Jika kode kosong, coba ambil dari last submission
             if (!kode) {
-                showNotification('Masukkan kode booking terlebih dahulu', 'error');
-                return;
+                const lastSubmission = JSON.parse(localStorage.getItem('lastSubmission') || '{}');
+                if (lastSubmission.bookingCode) {
+                    kode = lastSubmission.bookingCode;
+                    document.getElementById('cekKode').value = kode;
+                } else {
+                    showNotification('Masukkan kode booking terlebih dahulu', 'error');
+                    return;
+                }
             }
             
             // Clear previous result
@@ -1659,11 +1962,6 @@
             }
         }
         
-        // Validasi email
-        function isValidEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-        
         // Tampilkan loading
         function showLoading(show) {
             const submitBtn = document.getElementById('submitBtn');
@@ -1677,7 +1975,9 @@
                 loadingText.style.display = 'inline';
                 spinner.style.display = 'block';
             } else {
-                submitBtn.disabled = false;
+                if (!hasSubmittedInThisSession()) {
+                    submitBtn.disabled = false;
+                }
                 submitText.style.display = 'inline';
                 loadingText.style.display = 'none';
                 spinner.style.display = 'none';
@@ -1686,7 +1986,19 @@
         
         // Reset form
         function resetForm() {
-            document.getElementById('bookingForm').reset();
+            // Reset semua field
+            const fields = ['nama', 'nik', 'telepon', 'email', 'namaWbp'];
+            fields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) element.value = '';
+            });
+            
+            // Reset select fields
+            const selects = ['hubungan', 'statusWbp', 'jenisKunjungan'];
+            selects.forEach(selectId => {
+                const element = document.getElementById(selectId);
+                if (element) element.selectedIndex = 0;
+            });
             
             // Set tanggal default besok
             const tomorrow = new Date();
@@ -1694,16 +2006,44 @@
             document.getElementById('tanggal').value = tomorrow.toISOString().split('T')[0];
         }
         
+        // Reset form dengan session protection
+        function resetFormWithSessionProtection() {
+            // Reset form
+            resetForm();
+            
+            // Focus ke field pertama
+            document.getElementById('nama').focus();
+        }
+        
         // Simpan ke localStorage
         function saveToLocalStorage(formData, bookingCode) {
             try {
+                // CEK: Jangan simpan jika sudah ada dalam session ini
+                if (hasSubmittedInThisSession()) {
+                    console.log('Session already has submission, skipping local save');
+                    return false;
+                }
+                
                 const bookings = JSON.parse(localStorage.getItem('ptspBookings') || '[]');
+                
+                // Cek duplikasi NIK untuk tanggal yang sama di localStorage
+                const isDuplicate = bookings.some(booking => 
+                    booking.nik === formData.nik && 
+                    booking.tanggal === formData.tanggal &&
+                    !booking.synced
+                );
+                
+                if (isDuplicate) {
+                    console.log('Duplicate found in localStorage, skipping');
+                    return false;
+                }
                 
                 const bookingRecord = {
                     ...formData,
                     bookingCode: bookingCode,
                     savedAt: new Date().toISOString(),
-                    synced: false
+                    synced: false,
+                    sessionId: formData.sessionId
                 };
                 
                 bookings.push(bookingRecord);
@@ -1730,6 +2070,20 @@
                 
                 for (const booking of unsynced) {
                     try {
+                        // Cek duplikasi di server sebelum sync
+                        const checkResponse = await fetch(
+                            `${SCRIPT_URL}?action=getBookingStatus&bookingCode=${booking.bookingCode}`
+                        );
+                        const checkResult = await checkResponse.json();
+                        
+                        if (checkResult.success && checkResult.found) {
+                            // Data sudah ada di server, mark as synced
+                            console.log(`Booking ${booking.bookingCode} already exists on server`);
+                            booking.synced = true;
+                            continue;
+                        }
+                        
+                        // Kirim data ke server
                         const response = await fetch(SCRIPT_URL, {
                             method: 'POST',
                             headers: {
@@ -1738,19 +2092,17 @@
                             body: new URLSearchParams({
                                 ...booking,
                                 action: 'submitBooking',
-                                isResync: 'true'
+                                isResync: 'true',
+                                sessionId: booking.sessionId || ''
                             })
                         });
                         
                         if (response.ok) {
                             const result = await response.json();
                             if (result.success) {
-                                // Update status di localStorage
-                                const index = bookings.findIndex(b => b.bookingCode === booking.bookingCode);
-                                if (index !== -1) {
-                                    bookings[index].synced = true;
-                                    bookings[index].syncedAt = new Date().toISOString();
-                                }
+                                booking.synced = true;
+                                booking.syncedAt = new Date().toISOString();
+                                console.log(`Synced: ${booking.bookingCode}`);
                             }
                         }
                     } catch (syncError) {
@@ -1758,12 +2110,21 @@
                     }
                 }
                 
-                // Update localStorage
-                localStorage.setItem('ptspBookings', JSON.stringify(bookings));
+                // Hapus data yang sudah disinkron dari localStorage (simpan hanya 7 hari)
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
                 
-                if (unsynced.some(b => b.synced)) {
-                    console.log('Local data synced successfully');
-                }
+                const filteredBookings = bookings.filter(booking => {
+                    if (booking.synced) {
+                        const syncedAt = new Date(booking.syncedAt || booking.savedAt);
+                        return syncedAt > oneWeekAgo; // Simpan data synced hanya 7 hari
+                    }
+                    return true; // Simpan semua unsynced
+                });
+                
+                localStorage.setItem('ptspBookings', JSON.stringify(filteredBookings));
+                
+                console.log('Local storage cleaned. Remaining:', filteredBookings.length);
                 
             } catch (error) {
                 console.error('Auto-sync error:', error);
@@ -1818,14 +2179,24 @@
             localStorage.setItem('ptspBookings', JSON.stringify([]));
         }
         
-        // Auto sync setiap 30 detik
-        setInterval(syncLocalData, 30000);
-        
-        // Sync saat halaman load
-        window.addEventListener('load', syncLocalData);
+        // Auto sync setiap 30 detik jika online
+        setInterval(() => {
+            if (navigator.onLine) {
+                syncLocalData();
+            }
+        }, 30000);
         
         // Sync saat online
         window.addEventListener('online', syncLocalData);
+        
+        // Cegah accidental refresh setelah submit
+        window.addEventListener('beforeunload', function(e) {
+            if (formSubmitted && !hasSubmittedInThisSession()) {
+                const message = 'Anda belum menyelesaikan pendaftaran. Yakin ingin meninggalkan halaman?';
+                e.returnValue = message;
+                return message;
+            }
+        });
         
         console.log('Sistem PTSP Lapas Baubau berhasil dimuat!');
     </script>
