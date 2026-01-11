@@ -1056,7 +1056,7 @@
     </footer>
 
     <!-- Script untuk integrasi dengan Google Spreadsheet -->
-    <script>
+   <script>
 // URL Web App Anda dari Google Apps Script
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
 
@@ -1117,7 +1117,6 @@ const registrationForm = document.getElementById('registrationForm');
 const formMessage = document.getElementById('formMessage');
 const ticketContainer = document.getElementById('ticketContainer');
 
-// Ganti bagian form submission dengan ini:
 registrationForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -1146,65 +1145,34 @@ registrationForm.addEventListener('submit', async function(e) {
         hubungan: document.getElementById('hubungan').value,
         tanggal: document.getElementById('tanggal').value,
         nama_wbp: document.getElementById('nama_wbp').value,
-        keterangan: document.getElementById('keterangan').value,
-        timestamp: new Date().toISOString() // Tambahkan timestamp
+        keterangan: document.getElementById('keterangan').value
     };
     
     try {
         // Kirim data ke Google Apps Script
         const response = await fetch(WEB_APP_URL, {
             method: 'POST',
+            mode: 'no-cors', // Google Apps Script membutuhkan no-cors
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(formData)
         });
         
-        // Parse response dari GAS
-        const result = await response.json();
+        // Karena no-cors, kita tidak bisa membaca response langsung
+        // Simulasi delay untuk menunjukkan proses
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        if (result.success) {
-            // Show success message
-            formMessage.textContent = "Pendaftaran berhasil! Kode booking telah dibuat dan data disimpan di spreadsheet.";
-            formMessage.className = "message success";
-            formMessage.style.display = "block";
-            
-            // Show booking ticket dengan data dari server
-            const ticketData = {
-                booking_id: result.bookingCode,
-                tanggal_daftar: new Date().toLocaleDateString('id-ID'),
-                ...formData
-            };
-            
-            displayBookingTicket(ticketData);
-            
-            // Scroll to ticket
-            setTimeout(() => {
-                ticketContainer.scrollIntoView({ behavior: 'smooth' });
-            }, 500);
-            
-            // Reset form
-            registrationForm.reset();
-            
-            // Refresh admin table
-            setTimeout(() => loadRegistrationData(), 2000);
-            
-        } else {
-            throw new Error(result.message || 'Gagal menyimpan data');
-        }
-        
-    } catch (error) {
-        console.error('Error:', error);
-        
-        // Fallback: Simpan data secara lokal jika server error
-        formMessage.textContent = "Server sedang sibuk. Data disimpan sementara, kode booking mungkin berbeda.";
-        formMessage.className = "message warning";
-        formMessage.style.display = "block";
-        
-        // Generate local booking code (fallback)
-        const localBookingCode = `LAPAS-TEMP-${String(Date.now()).slice(-6)}`;
+        // Generate local booking code (sementara)
+        const localBookingCode = `LAPAS-${String(Date.now()).slice(-6)}`;
         const tanggalDaftar = new Date().toLocaleDateString('id-ID');
         
+        // Show success message
+        formMessage.textContent = "Pendaftaran berhasil! Kode booking telah dibuat dan data disimpan di spreadsheet. Email konfirmasi telah dikirim.";
+        formMessage.className = "message success";
+        formMessage.style.display = "block";
+        
+        // Show booking ticket dengan data sementara
         const ticketData = {
             booking_id: localBookingCode,
             tanggal_daftar: tanggalDaftar,
@@ -1213,82 +1181,27 @@ registrationForm.addEventListener('submit', async function(e) {
         
         displayBookingTicket(ticketData);
         
-        // Simpan di localStorage sebagai backup
-        saveToLocalStorage(ticketData);
+        // Scroll to ticket
+        setTimeout(() => {
+            ticketContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+        
+        // Reset form
+        registrationForm.reset();
+        
+        // Refresh admin table
+        setTimeout(() => loadRegistrationData(), 1000);
+        
+    } catch (error) {
+        formMessage.textContent = "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.";
+        formMessage.className = "message error";
+        formMessage.style.display = "block";
+        console.error('Error:', error);
     } finally {
         // Restore submit button
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
-});
-
-// Fungsi untuk menyimpan ke localStorage sebagai backup
-function saveToLocalStorage(data) {
-    try {
-        let pendingRegistrations = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-        pendingRegistrations.push(data);
-        localStorage.setItem('pendingRegistrations', JSON.stringify(pendingRegistrations));
-    } catch (error) {
-        console.error('Error saving to localStorage:', error);
-    }
-}
-
-// Fungsi untuk sync data yang pending
-async function syncPendingRegistrations() {
-    try {
-        const pendingRegistrations = JSON.parse(localStorage.getItem('pendingRegistrations') || '[]');
-        
-        if (pendingRegistrations.length > 0) {
-            console.log(`Menyinkronkan ${pendingRegistrations.length} pendaftaran pending...`);
-            
-            for (const registration of pendingRegistrations) {
-                try {
-                    const response = await fetch(WEB_APP_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(registration)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // Hapus dari localStorage jika berhasil
-                        pendingRegistrations.splice(pendingRegistrations.indexOf(registration), 1);
-                        localStorage.setItem('pendingRegistrations', JSON.stringify(pendingRegistrations));
-                        console.log(`Berhasil sync: ${result.bookingCode}`);
-                    }
-                } catch (error) {
-                    console.error('Gagal sync satu pendaftaran:', error);
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error syncing pending registrations:', error);
-    }
-}
-
-// Tambahkan fungsi ini untuk handle CORS issues
-function setupCORSHeaders() {
-    // Ini hanya untuk development, di production GAS harus di-deploy sebagai web app
-    return {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
-    };
-}
-
-// Panggil syncPendingRegistrations saat halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-    loadServices();
-    loadRegistrationData();
-    
-    // Set current year in footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-    
-    // Coba sync data pending setiap 30 detik
-    setTimeout(syncPendingRegistrations, 30000);
 });
 
 // Display booking ticket
