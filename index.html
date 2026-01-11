@@ -1152,19 +1152,32 @@ registrationForm.addEventListener('submit', async function(e) {
         // Kirim data ke Google Apps Script
         const response = await fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Google Apps Script membutuhkan no-cors
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        // Karena no-cors, kita tidak bisa membaca response langsung
-        // Simulasi delay untuk menunjukkan proses
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Generate local booking code (sementara)
-        const localBookingCode = `LAPAS-${String(Date.now()).slice(-6)}`;
+const response = await fetch(WEB_APP_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(formData)
+});
+
+const data = await response.json();
+
+if (data.success) {
+  document.getElementById("bookingCode").innerText = data.bookingCode;
+  document.getElementById("ticketBookingCode").innerText = data.bookingCode;
+
+  document.getElementById("qrCode").src =
+    "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + data.bookingCode;
+
+  const ticketData = {
+    booking_id: data.bookingCode,
+    tanggal_daftar: new Date().toLocaleDateString('id-ID'),
+    ...formData
+  };
+
+  displayBookingTicket(ticketData);
+}
+
         const tanggalDaftar = new Date().toLocaleDateString('id-ID');
         
         // Show success message
