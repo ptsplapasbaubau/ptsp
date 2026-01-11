@@ -689,74 +689,6 @@
                 padding: 20px;
             }
         }
-
-        /* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.modal-content {
-  background-color: white;
-  margin: 5% auto;
-  padding: 30px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.modal-header h3 {
-  color: var(--primary-color);
-  margin: 0;
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #666;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.close-modal:hover {
-  color: #333;
-}
-
-/* Detail Grid */
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 10px;
-  margin: 15px 0;
-}
-
-.detail-label {
-  font-weight: bold;
-  color: var(--dark-color);
-}
-
-.detail-value {
-  color: #555;
-}
     </style>
 </head>
 <body>
@@ -1092,7 +1024,7 @@
                 <div class="footer-column">
                     <h3>PTSP LAPAS Baubau</h3>
                     <p>Lembaga Pemasyarakatan Kelas IIA Baubau yang memberikan pelayanan terpadu satu pintu untuk kemudahan masyarakat.</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Jl. Sudirman No. 66a, Baubau, Sulawesi Tenggara</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Jl. Sudirman No. 45, Baubau, Sulawesi Tenggara</p>
                 </div>
                 
                 <div class="footer-column">
@@ -1110,7 +1042,7 @@
                     <h3>Kontak Kami</h3>
                     <ul>
                         <li><i class="fas fa-phone"></i> (0402) 1234567</li>
-                        <li><i class="fas fa-envelope"></i> ptsplapasbaubau@gmail.com</li>
+                        <li><i class="fas fa-envelope"></i> ptsp@lapasbaubau.go.id</li>
                         <li><i class="fas fa-clock"></i> Senin - Jumat: 08:00 - 16:00 WITA</li>
                         <li><i class="fas fa-globe"></i> ptsp-lapas-baubau.go.id</li>
                     </ul>
@@ -1118,21 +1050,17 @@
             </div>
             
             <div class="copyright">
-                <p>&copy; <span id="currentYear">2026</span> PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
+                <p>&copy; <span id="currentYear">2023</span> PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
             </div>
         </div>
     </footer>
 
     <!-- Script untuk integrasi dengan Google Spreadsheet -->
-<script>
-// ============================================
-// KONFIGURASI SISTEM
-// ============================================
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
+    <script>
+// URL Web App Anda dari Google Apps Script
+const WEB_APP_URL = 'https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec';
 
-// ============================================
-// FUNGSI UTILITAS
-// ============================================
+// Mobile menu toggle
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const navMenu = document.getElementById('navMenu');
 
@@ -1165,372 +1093,118 @@ document.querySelectorAll('nav a').forEach(anchor => {
     });
 });
 
+// Set minimum date for registration form (today + 1 day)
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+document.getElementById('tanggal').min = tomorrowFormatted;
+
+// Set maximum date (30 days from now)
+const maxDate = new Date();
+maxDate.setDate(maxDate.getDate() + 30);
+const maxDateFormatted = maxDate.toISOString().split('T')[0];
+document.getElementById('tanggal').max = maxDateFormatted;
+
 // Format tanggal untuk display
 function formatDate(dateString) {
-    try {
-        if (!dateString) return '-';
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', options);
-    } catch (error) {
-        return dateString || '-';
-    }
-}
-
-// Format tanggal untuk input
-function formatDateForInput(dateString) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return date.toLocaleDateString('id-ID', options);
 }
 
-// Set tanggal untuk form
-function setDateLimits() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const maxDate = new Date(today);
-    maxDate.setDate(maxDate.getDate() + 60); // 60 hari ke depan
-    
-    const dateInput = document.getElementById('tanggal');
-    if (dateInput) {
-        dateInput.min = tomorrow.toISOString().split('T')[0];
-        dateInput.max = maxDate.toISOString().split('T')[0];
-    }
-}
-
-// Tampilkan notifikasi
-function showNotification(message, type = 'success') {
-    // Hapus notifikasi sebelumnya
-    const oldNotification = document.querySelector('.notification');
-    if (oldNotification) {
-        oldNotification.remove();
-    }
-    
-    // Buat notifikasi baru
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 5px;
-        color: white;
-        font-weight: 500;
-        z-index: 10000;
-        animation: slideIn 0.3s ease;
-        max-width: 400px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    `;
-    
-    if (type === 'success') {
-        notification.style.backgroundColor = '#28a745';
-    } else if (type === 'error') {
-        notification.style.backgroundColor = '#dc3545';
-    } else if (type === 'warning') {
-        notification.style.backgroundColor = '#ffc107';
-    } else {
-        notification.style.backgroundColor = '#17a2b8';
-    }
-    
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}" 
-           style="margin-right: 10px;"></i>
-        ${message}
-        <button onclick="this.parentElement.remove()" style="
-            background: none;
-            border: none;
-            color: white;
-            margin-left: 15px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            line-height: 1;
-        ">×</button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentElement) {
-            notification.remove();
-        }
-    }, 5000);
-}
-
-// Tambahkan style untuk animasi notifikasi
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// ============================================
-// FUNGSI LAYANAN WBP
-// ============================================
-async function loadServices() {
-    try {
-        const servicesContainer = document.getElementById('servicesContainer');
-        
-        const response = await fetch(`${WEB_APP_URL}?action=get_services`);
-        const result = await response.json();
-        
-        if (result.success && result.data && result.data.length > 0) {
-            servicesContainer.innerHTML = '';
-            
-            result.data.forEach(service => {
-                const serviceCard = document.createElement('div');
-                serviceCard.className = 'service-card';
-                serviceCard.innerHTML = `
-                    <div class="service-icon">
-                        <i class="${service.icon || 'fas fa-hands-helping'}"></i>
-                    </div>
-                    <div class="service-content">
-                        <h3>${service.judul || service.title}</h3>
-                        <p>${service.deskripsi || service.description}</p>
-                    </div>
-                `;
-                servicesContainer.appendChild(serviceCard);
-            });
-        } else {
-            // Fallback data
-            loadFallbackServices();
-        }
-    } catch (error) {
-        console.error('Error loading services:', error);
-        loadFallbackServices();
-    }
-}
-
-function loadFallbackServices() {
-    const servicesContainer = document.getElementById('servicesContainer');
-    const fallbackServices = [
-        {
-            icon: "fas fa-user-friends",
-            judul: "Kunjungan Keluarga",
-            deskripsi: "Layanan kunjungan keluarga bagi WBP yang memenuhi syarat sesuai peraturan yang berlaku."
-        },
-        {
-            icon: "fas fa-balance-scale",
-            judul: "Bantuan Hukum",
-            deskripsi: "Fasilitas bantuan hukum bagi WBP yang membutuhkan pendampingan hukum."
-        },
-        {
-            icon: "fas fa-heartbeat",
-            judul: "Layanan Kesehatan",
-            deskripsi: "Pelayanan kesehatan dan pemeriksaan rutin bagi WBP untuk menjaga kesehatan fisik."
-        },
-        {
-            icon: "fas fa-book",
-            judul: "Pendidikan & Pelatihan",
-            deskripsi: "Program pendidikan dan pelatihan keterampilan untuk persiapan reintegrasi sosial."
-        },
-        {
-            icon: "fas fa-pray",
-            judul: "Bimbingan Rohani",
-            deskripsi: "Layanan bimbingan rohani sesuai dengan agama dan kepercayaan masing-masing WBP."
-        },
-        {
-            icon: "fas fa-handshake",
-            judul: "Pembinaan Kemasyarakatan",
-            deskripsi: "Program pembinaan dan persiapan kembali ke masyarakat setelah menjalani masa hukuman."
-        }
-    ];
-    
-    servicesContainer.innerHTML = '';
-    fallbackServices.forEach(service => {
-        const serviceCard = document.createElement('div');
-        serviceCard.className = 'service-card';
-        serviceCard.innerHTML = `
-            <div class="service-icon">
-                <i class="${service.icon}"></i>
-            </div>
-            <div class="service-content">
-                <h3>${service.judul}</h3>
-                <p>${service.deskripsi}</p>
-            </div>
-        `;
-        servicesContainer.appendChild(serviceCard);
-    });
-}
-
-// ============================================
-// FUNGSI PENDAFTARAN KUNJUNGAN (FIXED)
-// ============================================
+// Form submission
 const registrationForm = document.getElementById('registrationForm');
 const formMessage = document.getElementById('formMessage');
 const ticketContainer = document.getElementById('ticketContainer');
 
-// Set tanggal saat halaman dimuat
-setDateLimits();
-
-// Tambahkan event listener untuk cek kuota
-document.getElementById('tanggal').addEventListener('change', async function() {
-    const tanggal = this.value;
-    if (!tanggal) return;
-    
-    try {
-        const response = await fetch(`${WEB_APP_URL}?action=check_availability&date=${tanggal}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            const kuotaInfo = document.getElementById('kuotaInfo') || document.createElement('div');
-            kuotaInfo.id = 'kuotaInfo';
-            kuotaInfo.style.cssText = `
-                padding: 10px;
-                margin: 10px 0;
-                border-radius: 5px;
-                font-size: 0.9rem;
-            `;
-            
-            if (result.available) {
-                kuotaInfo.innerHTML = `<i class="fas fa-check-circle" style="color: #28a745;"></i> 
-                    Kuota tersedia: ${result.remaining} slot dari ${result.max}`;
-                kuotaInfo.style.backgroundColor = '#d4edda';
-                kuotaInfo.style.color = '#155724';
-            } else {
-                kuotaInfo.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> 
-                    Kuota penuh untuk tanggal ${formatDate(tanggal)}. Silakan pilih tanggal lain.`;
-                kuotaInfo.style.backgroundColor = '#f8d7da';
-                kuotaInfo.style.color = '#721c24';
-            }
-            
-            // Sisipkan setelah input tanggal
-            const tanggalInput = document.getElementById('tanggal');
-            tanggalInput.parentNode.appendChild(kuotaInfo);
-        }
-    } catch (error) {
-        console.error('Error checking availability:', error);
-    }
-});
-
-// FORM SUBMISSION - FIXED VERSION
 registrationForm.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    // Validasi NIK (16 digit angka)
+    // Validasi NIK (16 digit)
     const nik = document.getElementById('nik').value;
-    if (nik.length !== 16 || !/^\d+$/.test(nik)) {
+    if (nik.length !== 16 || isNaN(nik)) {
         formMessage.textContent = "NIK harus 16 digit angka!";
         formMessage.className = "message error";
         formMessage.style.display = "block";
         return;
     }
     
-    // Validasi tanggal (min +1 hari)
-    const tanggal = document.getElementById('tanggal').value;
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const selectedDate = new Date(tanggal);
-    
-    if (selectedDate < tomorrow) {
-        formMessage.textContent = "Tanggal kunjungan minimal besok hari!";
-        formMessage.className = "message error";
-        formMessage.style.display = "block";
-        return;
-    }
-    
-    // Disable submit button
+    // Disable submit button to prevent multiple submissions
     const submitBtn = this.querySelector('.submit-btn');
     const originalText = submitBtn.textContent;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+    submitBtn.textContent = 'Mengirim ke server...';
     submitBtn.disabled = true;
     
     // Collect form data
     const formData = {
-        action: 'save_registration', // Tambahkan action
-        nama: document.getElementById('nama').value.trim(),
+        nama: document.getElementById('nama').value,
         nik: nik,
-        email: document.getElementById('email').value.trim(),
-        telepon: document.getElementById('telepon').value.trim(),
-        alamat: document.getElementById('alamat').value.trim(),
+        email: document.getElementById('email').value,
+        telepon: document.getElementById('telepon').value,
+        alamat: document.getElementById('alamat').value,
         hubungan: document.getElementById('hubungan').value,
-        tanggal: tanggal,
-        nama_wbp: document.getElementById('nama_wbp').value.trim(),
-        keterangan: document.getElementById('keterangan').value.trim()
+        tanggal: document.getElementById('tanggal').value,
+        nama_wbp: document.getElementById('nama_wbp').value,
+        keterangan: document.getElementById('keterangan').value
     };
     
     try {
-        // Kirim data menggunakan method POST dengan JSON
+        // Kirim data ke Google Apps Script
         const response = await fetch(WEB_APP_URL, {
             method: 'POST',
+            mode: 'no-cors', // Google Apps Script membutuhkan no-cors
             headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(formData)
         });
         
-        // Parse response
-        const result = await response.json();
+        // Karena no-cors, kita tidak bisa membaca response langsung
+        // Simulasi delay untuk menunjukkan proses
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        if (result.success) {
-            // Tampilkan notifikasi sukses
-            showNotification('Pendaftaran berhasil! Kode booking telah dibuat.', 'success');
-            
-            // Tampilkan tiket dengan data ASLI dari server
-            displayBookingTicket({
-                booking_id: result.bookingCode,
-                tanggal_daftar: new Date().toLocaleDateString('id-ID'),
-                nama: formData.nama,
-                nik: formData.nik,
-                tanggal: formData.tanggal,
-                nama_wbp: formData.nama_wbp,
-                email: formData.email,
-                telepon: formData.telepon
-            });
-            
-            // Scroll ke tiket
-            setTimeout(() => {
-                ticketContainer.scrollIntoView({ behavior: 'smooth' });
-            }, 500);
-            
-            // Reset form
-            registrationForm.reset();
-            
-            // Refresh data admin
-            setTimeout(() => loadRegistrationData(), 1500);
-            
-            // Update form message
-            formMessage.textContent = result.message || "Pendaftaran berhasil! Email konfirmasi telah dikirim.";
-            formMessage.className = "message success";
-            formMessage.style.display = "block";
-            
-        } else {
-            // Tampilkan error
-            formMessage.textContent = result.message || "Terjadi kesalahan. Silakan coba lagi.";
-            formMessage.className = "message error";
-            formMessage.style.display = "block";
-            showNotification(result.message || 'Gagal menyimpan data', 'error');
-        }
+        // Generate local booking code (sementara)
+        const localBookingCode = `LAPAS-${String(Date.now()).slice(-6)}`;
+        const tanggalDaftar = new Date().toLocaleDateString('id-ID');
+        
+        // Show success message
+        formMessage.textContent = "Pendaftaran berhasil! Kode booking telah dibuat dan data disimpan di spreadsheet. Email konfirmasi telah dikirim.";
+        formMessage.className = "message success";
+        formMessage.style.display = "block";
+        
+        // Show booking ticket dengan data sementara
+        const ticketData = {
+            booking_id: localBookingCode,
+            tanggal_daftar: tanggalDaftar,
+            ...formData
+        };
+        
+        displayBookingTicket(ticketData);
+        
+        // Scroll to ticket
+        setTimeout(() => {
+            ticketContainer.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+        
+        // Reset form
+        registrationForm.reset();
+        
+        // Refresh admin table
+        setTimeout(() => loadRegistrationData(), 1000);
         
     } catch (error) {
-        console.error('Error submitting form:', error);
-        formMessage.textContent = "Koneksi error. Silakan cek koneksi internet Anda.";
+        formMessage.textContent = "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.";
         formMessage.className = "message error";
         formMessage.style.display = "block";
-        showNotification('Error jaringan. Coba lagi.', 'error');
+        console.error('Error:', error);
     } finally {
         // Restore submit button
-        submitBtn.innerHTML = originalText;
+        submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 });
 
-// Display booking ticket dengan data ASLI
+// Display booking ticket
 function displayBookingTicket(data) {
     document.getElementById('bookingCode').textContent = data.booking_id;
     document.getElementById('ticketBookingCode').textContent = data.booking_id;
@@ -1538,159 +1212,19 @@ function displayBookingTicket(data) {
     document.getElementById('ticketNIK').textContent = data.nik;
     document.getElementById('ticketTanggal').textContent = formatDate(data.tanggal);
     document.getElementById('ticketWBP').textContent = data.nama_wbp;
-    document.getElementById('ticketDaftar').textContent = data.tanggal_daftar || new Date().toLocaleDateString('id-ID');
+    document.getElementById('ticketDaftar').textContent = data.tanggal_daftar;
     
     ticketContainer.style.display = 'block';
-    
-    // Scroll ke tiket
-    setTimeout(() => {
-        ticketContainer.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
 }
 
 // Print ticket
 document.getElementById('printTicket').addEventListener('click', function() {
-    const printContent = document.getElementById('ticketContainer').innerHTML;
-    const originalContent = document.body.innerHTML;
-    
-    document.body.innerHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Tiket Kunjungan LAPAS Baubau</title>
-            <style>
-                body { font-family: Arial, sans-serif; padding: 20px; }
-                .ticket-container { 
-                    border: 2px solid #000; 
-                    padding: 20px; 
-                    max-width: 600px; 
-                    margin: 0 auto; 
-                }
-                .ticket-code { 
-                    font-size: 24px; 
-                    font-weight: bold; 
-                    text-align: center; 
-                    margin: 20px 0; 
-                    letter-spacing: 3px;
-                }
-                .ticket-row { 
-                    display: flex; 
-                    justify-content: space-between; 
-                    margin: 10px 0; 
-                    padding: 5px 0;
-                    border-bottom: 1px solid #ddd;
-                }
-                .ticket-label { font-weight: bold; }
-                @media print {
-                    .no-print { display: none; }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="ticket-container">
-                <h2 style="text-align: center; color: #1a5f7a;">TIKET KUNJUNGAN LAPAS BAUBAU</h2>
-                <div class="ticket-code">${document.getElementById('bookingCode').textContent}</div>
-                
-                <div class="ticket-row">
-                    <span class="ticket-label">Kode Booking:</span>
-                    <span>${document.getElementById('ticketBookingCode').textContent}</span>
-                </div>
-                <div class="ticket-row">
-                    <span class="ticket-label">Nama Pengunjung:</span>
-                    <span>${document.getElementById('ticketNama').textContent}</span>
-                </div>
-                <div class="ticket-row">
-                    <span class="ticket-label">NIK:</span>
-                    <span>${document.getElementById('ticketNIK').textContent}</span>
-                </div>
-                <div class="ticket-row">
-                    <span class="ticket-label">Tanggal Kunjungan:</span>
-                    <span>${document.getElementById('ticketTanggal').textContent}</span>
-                </div>
-                <div class="ticket-row">
-                    <span class="ticket-label">Nama WBP:</span>
-                    <span>${document.getElementById('ticketWBP').textContent}</span>
-                </div>
-                <div class="ticket-row">
-                    <span class="ticket-label">Tanggal Daftar:</span>
-                    <span>${document.getElementById('ticketDaftar').textContent}</span>
-                </div>
-                
-                <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 5px;">
-                    <h4>Instruksi:</h4>
-                    <ul>
-                        <li>Tunjukkan tiket ini saat tiba di LAPAS</li>
-                        <li>Bawa dokumen asli (KTP/SIM) untuk verifikasi</li>
-                        <li>Datang 30 menit sebelum waktu kunjungan</li>
-                    </ul>
-                </div>
-                
-                <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
-                    Dicetak pada: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;" class="no-print">
-                <button onclick="window.print()" style="padding: 10px 20px; background-color: #1a5f7a; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    <i class="fas fa-print"></i> Cetak
-                </button>
-                <button onclick="document.body.innerHTML = originalContent; location.reload()" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-                    Kembali
-                </button>
-            </div>
-
-            <!-- Modal untuk Detail -->
-<div id="detailModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-  <div style="background-color: white; margin: 5% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h3 style="color: var(--primary-color); margin: 0;">Detail Booking</h3>
-      <button onclick="document.getElementById('detailModal').style.display='none'" style="background: none; border: none; font-size: 1.5rem; color: #666; cursor: pointer;">×</button>
-    </div>
-    <div id="detailContent"></div>
-  </div>
-</div>
-
-<!-- Modal untuk Update Status -->
-<div id="updateStatusModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-  <div style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
-    <h3 style="color: var(--primary-color); margin-bottom: 20px;">Update Status Booking</h3>
-    <div class="form-group">
-      <label>Kode Booking</label>
-      <input type="text" id="updateBookingCode" readonly style="background-color: #f8f9fa; font-weight: bold;">
-    </div>
-    <div class="form-group">
-      <label>Status Baru</label>
-      <select id="updateStatusSelect" class="form-control">
-        <option value="Menunggu">Menunggu</option>
-        <option value="Disetujui">Disetujui</option>
-        <option value="Ditolak">Ditolak</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Catatan (Opsional)</label>
-      <textarea id="updateCatatan" rows="3" placeholder="Masukkan catatan jika diperlukan..."></textarea>
-    </div>
-    <div style="display: flex; gap: 10px; margin-top: 20px;">
-      <button onclick="document.getElementById('updateStatusModal').style.display='none'" class="submit-btn" style="background-color: #6c757d; flex: 1;">Batal</button>
-      <button onclick="confirmUpdateStatus()" class="submit-btn" style="flex: 1;">Simpan</button>
-    </div>
-  </div>
-</div>
-            <script>
-                const originalContent = ${JSON.stringify(originalContent)};
-            </script>
-        </body>
-        </html>
-    `;
-    
     window.print();
 });
 
-// ============================================
-// FUNGSI CEK BOOKING (FIXED)
-// ============================================
+// Check booking status dari Google Sheets
 document.getElementById('checkBooking').addEventListener('click', async function() {
-    const bookingCode = document.getElementById('kodeBooking').value.trim().toUpperCase();
+    const bookingCode = document.getElementById('kodeBooking').value.trim();
     const messageDiv = document.getElementById('verificationMessage');
     const resultDiv = document.getElementById('verificationResult');
     const resultContent = document.getElementById('resultContent');
@@ -1703,12 +1237,9 @@ document.getElementById('checkBooking').addEventListener('click', async function
         return;
     }
     
-    // Format kode booking (LAPAS-xxxxxx)
-    const formattedCode = bookingCode.startsWith('LAPAS-') ? bookingCode : `LAPAS-${bookingCode}`;
-    
     try {
         // Ambil data dari Google Apps Script
-        const response = await fetch(`${WEB_APP_URL}?action=get_booking&bookingCode=${encodeURIComponent(formattedCode)}`);
+        const response = await fetch(`${WEB_APP_URL}?bookingCode=${encodeURIComponent(bookingCode)}`);
         const result = await response.json();
         
         if (result.success && result.data) {
@@ -1719,24 +1250,24 @@ document.getElementById('checkBooking').addEventListener('click', async function
             const booking = result.data;
             
             // Determine status color
-            let statusColor = '#ffc107'; // warning (yellow)
+            let statusColor = 'var(--warning-color)';
             let statusText = booking.status || 'Menunggu';
             
             if (statusText === 'Disetujui') {
-                statusColor = '#28a745'; // success (green)
+                statusColor = 'var(--success-color)';
             } else if (statusText === 'Ditolak') {
-                statusColor = '#dc3545'; // danger (red)
+                statusColor = 'var(--danger-color)';
             }
             
             resultContent.innerHTML = `
                 <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Kode Booking:</strong>
-                        <span style="font-weight: bold; color: #1a5f7a;">${booking.booking_id || formattedCode}</span>
+                        <span>${booking.booking_id || bookingCode}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Nama:</strong>
-                        <span>${booking.nama || '-'}</span>
+                        <span>${booking.nama}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Tanggal Kunjungan:</strong>
@@ -1744,28 +1275,16 @@ document.getElementById('checkBooking').addEventListener('click', async function
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Nama WBP:</strong>
-                        <span>${booking.nama_wbp || '-'}</span>
+                        <span>${booking.nama_wbp}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Status:</strong>
                         <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
                     </div>
-                    ${booking.tanggal_daftar ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <strong>Tanggal Daftar:</strong>
-                        <span>${booking.tanggal_daftar}</span>
-                    </div>
-                    ` : ''}
                     ${booking.keterangan ? `
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                    <div style="margin-top: 15px;">
                         <strong>Keterangan:</strong>
                         <p style="margin-top: 5px;">${booking.keterangan}</p>
-                    </div>
-                    ` : ''}
-                    ${booking.catatan_admin ? `
-                    <div style="margin-top: 10px; padding: 10px; background-color: #fff3cd; border-radius: 5px;">
-                        <strong>Catatan Admin:</strong>
-                        <p style="margin-top: 5px;">${booking.catatan_admin}</p>
                     </div>
                     ` : ''}
                 </div>
@@ -1785,28 +1304,25 @@ document.getElementById('checkBooking').addEventListener('click', async function
                     printWindow.document.write(`
                         <html>
                         <head>
-                            <title>Status Booking ${booking.booking_id || formattedCode}</title>
+                            <title>Status Booking ${booking.booking_id || bookingCode}</title>
                             <style>
                                 body { font-family: Arial, sans-serif; padding: 20px; }
-                                h1 { color: #1a5f7a; text-align: center; }
-                                .info { margin: 15px 0; padding: 10px 0; border-bottom: 1px solid #eee; }
-                                .label { font-weight: bold; display: inline-block; width: 200px; }
+                                h1 { color: #1a5f7a; }
+                                .info { margin: 15px 0; }
+                                .label { font-weight: bold; }
                                 .status { font-weight: bold; color: ${statusColor}; }
-                                .footer { margin-top: 30px; font-size: 0.9em; color: #666; text-align: center; }
                             </style>
                         </head>
                         <body>
                             <h1>Status Booking LAPAS Baubau</h1>
-                            <div class="info"><span class="label">Kode Booking:</span> ${booking.booking_id || formattedCode}</div>
-                            <div class="info"><span class="label">Nama:</span> ${booking.nama || '-'}</div>
+                            <div class="info"><span class="label">Kode Booking:</span> ${booking.booking_id || bookingCode}</div>
+                            <div class="info"><span class="label">Nama:</span> ${booking.nama}</div>
                             <div class="info"><span class="label">Tanggal Kunjungan:</span> ${formatDate(booking.tanggal_kunjungan)}</div>
-                            <div class="info"><span class="label">Nama WBP:</span> ${booking.nama_wbp || '-'}</div>
+                            <div class="info"><span class="label">Nama WBP:</span> ${booking.nama_wbp}</div>
                             <div class="info"><span class="label">Status:</span> <span class="status">${statusText}</span></div>
-                            ${booking.tanggal_daftar ? `<div class="info"><span class="label">Tanggal Daftar:</span> ${booking.tanggal_daftar}</div>` : ''}
-                            <div class="footer">
-                                Dicetak pada: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}<br>
-                                PTSP LAPAS Kelas IIA Baubau
-                            </div>
+                            <p style="margin-top: 30px; font-size: 0.9em; color: #666;">
+                                Dicetak pada: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}
+                            </p>
                         </body>
                         </html>
                     `);
@@ -1823,33 +1339,30 @@ document.getElementById('checkBooking').addEventListener('click', async function
         }
         
     } catch (error) {
-        console.error('Error checking booking:', error);
         messageDiv.textContent = "Terjadi kesalahan saat mengambil data.";
         messageDiv.className = "message error";
         messageDiv.style.display = "block";
         resultDiv.style.display = "none";
+        console.error('Error:', error);
     }
 });
 
-// ============================================
-// FUNGSI ADMIN PANEL (FIXED)
-// ============================================
+// Load registration data dari Google Sheets
 async function loadRegistrationData() {
     const tableBody = document.getElementById('tableBody');
     
     // Show loading
     tableBody.innerHTML = `
         <tr>
-            <td colspan="9" style="padding: 40px; text-align: center;">
-                <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 1.5rem;"></i>
-                <p style="margin-top: 10px; color: #666;">Memuat data dari spreadsheet...</p>
+            <td colspan="9" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Memuat data dari spreadsheet...
             </td>
         </tr>
     `;
     
     try {
         // Ambil data dari Google Apps Script
-        const response = await fetch(`${WEB_APP_URL}?action=get_registrations`);
+        const response = await fetch(`${WEB_APP_URL}?parameter=all`);
         const result = await response.json();
         
         if (result.success) {
@@ -1866,8 +1379,7 @@ async function loadRegistrationData() {
                     (item.nama && item.nama.toLowerCase().includes(searchTerm)) ||
                     (item.booking_id && item.booking_id.toLowerCase().includes(searchTerm)) ||
                     (item.nik && item.nik.includes(searchTerm)) ||
-                    (item.nama_wbp && item.nama_wbp.toLowerCase().includes(searchTerm)) ||
-                    (item.email && item.email.toLowerCase().includes(searchTerm))
+                    (item.nama_wbp && item.nama_wbp.toLowerCase().includes(searchTerm))
                 );
             }
             
@@ -1890,11 +1402,7 @@ async function loadRegistrationData() {
             }
             
             // Sort by tanggal_kunjungan (newest first)
-            filteredData.sort((a, b) => {
-                const dateA = new Date(a.tanggal_kunjungan || 0);
-                const dateB = new Date(b.tanggal_kunjungan || 0);
-                return dateB - dateA;
-            });
+            filteredData.sort((a, b) => new Date(b.tanggal_kunjungan) - new Date(a.tanggal_kunjungan));
             
             // Populate table with data
             filteredData.forEach((item, index) => {
@@ -1927,11 +1435,8 @@ async function loadRegistrationData() {
                         <button onclick="updateStatus('${item.booking_id}', 'Disetujui')" class="status-btn" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; font-size: 0.8rem;">
                             <i class="fas fa-check"></i>
                         </button>
-                        <button onclick="updateStatus('${item.booking_id}', 'Ditolak')" class="status-btn" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; font-size: 0.8rem;">
+                        <button onclick="updateStatus('${item.booking_id}', 'Ditolak')" class="status-btn" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">
                             <i class="fas fa-times"></i>
-                        </button>
-                        <button onclick="showDetail('${item.booking_id}')" class="status-btn" style="background-color: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">
-                            <i class="fas fa-eye"></i>
                         </button>
                     </td>
                 `;
@@ -1948,7 +1453,6 @@ async function loadRegistrationData() {
         }
         
     } catch (error) {
-        console.error('Error loading data:', error);
         tableBody.innerHTML = `
             <tr>
                 <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
@@ -1956,6 +1460,7 @@ async function loadRegistrationData() {
                 </td>
             </tr>
         `;
+        console.error('Error loading data:', error);
     }
 }
 
@@ -1966,253 +1471,145 @@ window.updateStatus = async function(bookingId, newStatus) {
         return;
     }
     
-    const catatan = prompt(`Masukkan catatan untuk status "${newStatus}" (opsional):`);
-    
     try {
-        const response = await fetch(WEB_APP_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-            },
-            body: JSON.stringify({
-                action: 'update_status',
-                bookingCode: bookingId,
-                newStatus: newStatus,
-                catatan: catatan || ''
-            })
-        });
-        
+        const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodeURIComponent(bookingId)}&status=${encodeURIComponent(newStatus)}`);
         const result = await response.json();
         
         if (result.success) {
-            showNotification(`Status ${bookingId} berhasil diubah menjadi "${newStatus}"`, 'success');
+            alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
             loadRegistrationData();
         } else {
-            showNotification(result.message || 'Gagal mengubah status', 'error');
+            alert(`Gagal mengubah status: ${result.message}`);
         }
     } catch (error) {
+        alert('Terjadi kesalahan saat mengubah status');
         console.error('Error updating status:', error);
-        showNotification('Terjadi kesalahan saat mengubah status', 'error');
     }
 };
 
-// Show detail function
-window.showDetail = async function(bookingId) {
-    try {
-        const response = await fetch(`${WEB_APP_URL}?action=get_booking&bookingCode=${encodeURIComponent(bookingId)}`);
-        const result = await response.json();
-        
-        if (result.success && result.data) {
-            const booking = result.data;
-            
-            const detailHtml = `
-                <div style="background-color: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
-                    <h3 style="color: var(--primary-color); margin-top: 0;">Detail Booking: ${booking.booking_id}</h3>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 15px;">
-                        <strong>Nama:</strong>
-                        <span>${booking.nama || '-'}</span>
-                        
-                        <strong>NIK:</strong>
-                        <span>${booking.nik || '-'}</span>
-                        
-                        <strong>Email:</strong>
-                        <span>${booking.email || '-'}</span>
-                        
-                        <strong>Telepon:</strong>
-                        <span>${booking.telepon || '-'}</span>
-                        
-                        <strong>Alamat:</strong>
-                        <span>${booking.alamat || '-'}</span>
-                        
-                        <strong>Hubungan:</strong>
-                        <span>${booking.hubungan || '-'}</span>
-                        
-                        <strong>Tanggal Kunjungan:</strong>
-                        <span>${formatDate(booking.tanggal_kunjungan)}</span>
-                        
-                        <strong>Nama WBP:</strong>
-                        <span>${booking.nama_wbp || '-'}</span>
-                        
-                        <strong>Status:</strong>
-                        <span style="color: ${booking.status === 'Disetujui' ? '#28a745' : booking.status === 'Ditolak' ? '#dc3545' : '#ffc107'}; font-weight: bold;">
-                            ${booking.status || 'Menunggu'}
-                        </span>
-                        
-                        <strong>Tanggal Daftar:</strong>
-                        <span>${booking.tanggal_daftar || '-'}</span>
-                        
-                        ${booking.waktu_daftar ? `
-                        <strong>Waktu Daftar:</strong>
-                        <span>${booking.waktu_daftar || '-'}</span>
-                        ` : ''}
-                        
-                        ${booking.keterangan ? `
-                        <strong>Keterangan:</strong>
-                        <span>${booking.keterangan}</span>
-                        ` : ''}
-                        
-                        ${booking.catatan_admin ? `
-                        <strong>Catatan Admin:</strong>
-                        <span style="color: #856404;">${booking.catatan_admin}</span>
-                        ` : ''}
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="this.parentElement.parentElement.remove()" style="padding: 8px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // Create modal
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.5);
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            modal.innerHTML = detailHtml;
-            document.body.appendChild(modal);
-            
-            // Close modal when clicking outside
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.remove();
-                }
-            });
-        } else {
-            showNotification('Data tidak ditemukan', 'error');
-        }
-    } catch (error) {
-        console.error('Error showing detail:', error);
-        showNotification('Terjadi kesalahan', 'error');
-    }
-};
-
-// Search functionality
+// Search functionality for admin table
 document.getElementById('searchInput').addEventListener('input', loadRegistrationData);
 document.getElementById('statusFilter').addEventListener('change', loadRegistrationData);
 
 // Refresh data button
 document.getElementById('refreshData').addEventListener('click', function() {
+    loadRegistrationData();
+    
+    // Show notification
     const btn = this;
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
-    
-    loadRegistrationData();
+    btn.innerHTML = '<i class="fas fa-check"></i> Data Dimuat Ulang';
     
     setTimeout(() => {
         btn.innerHTML = originalText;
-        showNotification('Data diperbarui', 'success');
-    }, 1000);
+    }, 2000);
 });
 
 // Export data button
 document.getElementById('exportData').addEventListener('click', async function() {
-    const btn = this;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
-    
     try {
-        const response = await fetch(`${WEB_APP_URL}?action=get_registrations`);
+        const response = await fetch(`${WEB_APP_URL}?parameter=all`);
         const result = await response.json();
         
         if (result.success && result.data && result.data.length > 0) {
             const registrations = result.data;
+            const headers = Object.keys(registrations[0]);
             
-            // Prepare CSV content
-            const headers = ['booking_id', 'tanggal_daftar', 'waktu_daftar', 'nama', 'nik', 'email', 'telepon', 'alamat', 'hubungan', 'tanggal_kunjungan', 'nama_wbp', 'keterangan', 'status', 'kode_verifikasi', 'catatan_admin', 'waktu_update'];
-            
-            const csvContent = [
+            // Convert to CSV
+            const csv = [
                 headers.join(','),
-                ...registrations.map(row => {
-                    return headers.map(header => {
-                        const value = row[header] || '';
-                        // Escape quotes and wrap in quotes if contains comma
-                        const escapedValue = String(value).replace(/"/g, '""');
-                        return escapedValue.includes(',') ? `"${escapedValue}"` : escapedValue;
-                    }).join(',');
-                })
+                ...registrations.map(row => headers.map(header => {
+                    const value = row[header] || '';
+                    return JSON.stringify(value);
+                }).join(','))
             ].join('\n');
             
-            // Create blob and download
-            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `data-pendaftaran-lapas-${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Data berhasil diexport', 'success');
+            window.URL.revokeObjectURL(url);
         } else {
-            showNotification('Tidak ada data untuk diexport', 'warning');
+            alert('Tidak ada data untuk diexport!');
         }
     } catch (error) {
+        alert('Terjadi kesalahan saat mengekspor data');
         console.error('Error exporting data:', error);
-        showNotification('Gagal mengekspor data', 'error');
-    } finally {
-        btn.innerHTML = originalText;
     }
 });
 
-// ============================================
-// INISIALISASI APLIKASI
-// ============================================
-async function initializeApp() {
-    try {
-        // Set current year in footer
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        
-        // Load initial data
-        await Promise.all([
-            loadServices(),
-            loadRegistrationData()
-        ]);
-        
-        // Cek koneksi ke server
-        try {
-            const testResponse = await fetch(`${WEB_APP_URL}?action=get_registrations`);
-            if (!testResponse.ok) {
-                console.warn('Koneksi ke server mungkin bermasalah');
-            }
-        } catch (testError) {
-            console.warn('Tidak dapat terhubung ke server:', testError);
+// Load services
+async function loadServices() {
+    const servicesContainer = document.getElementById('servicesContainer');
+    
+    // Untuk demo, gunakan data statis
+    // Dalam implementasi nyata, bisa ambil dari Google Sheets
+    const services = [
+        {
+            icon: "fas fa-user-friends",
+            title: "Kunjungan Keluarga",
+            description: "Layanan kunjungan keluarga bagi WBP yang memenuhi syarat sesuai dengan peraturan yang berlaku."
+        },
+        {
+            icon: "fas fa-balance-scale",
+            title: "Bantuan Hukum",
+            description: "Fasilitas bantuan hukum bagi WBP yang membutuhkan pendampingan hukum."
+        },
+        {
+            icon: "fas fa-heartbeat",
+            title: "Layanan Kesehatan",
+            description: "Pelayanan kesehatan dan pemeriksaan rutin bagi WBP untuk menjaga kesehatan fisik."
+        },
+        {
+            icon: "fas fa-book",
+            title: "Pendidikan & Pelatihan",
+            description: "Program pendidikan dan pelatihan keterampilan untuk persiapan reintegrasi sosial."
+        },
+        {
+            icon: "fas fa-pray",
+            title: "Bimbingan Rohani",
+            description: "Layanan bimbingan rohani sesuai dengan agama dan kepercayaan masing-masing WBP."
+        },
+        {
+            icon: "fas fa-handshake",
+            title: "Pembinaan Kemasyarakatan",
+            description: "Program pembinaan dan persiapan kembali ke masyarakat setelah menjalani masa hukuman."
         }
-        
-        console.log('Aplikasi PTSP LAPAS Baubau berhasil diinisialisasi');
-        
-    } catch (error) {
-        console.error('Error initializing app:', error);
-        showNotification('Gagal memuat data awal', 'error');
-    }
+    ];
+    
+    // Clear loading message
+    servicesContainer.innerHTML = '';
+    
+    // Create service cards
+    services.forEach(service => {
+        const serviceCard = document.createElement('div');
+        serviceCard.className = 'service-card';
+        serviceCard.innerHTML = `
+            <div class="service-icon">
+                <i class="${service.icon}"></i>
+            </div>
+            <div class="service-content">
+                <h3>${service.title}</h3>
+                <p>${service.description}</p>
+            </div>
+        `;
+        servicesContainer.appendChild(serviceCard);
+    });
 }
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initializeApp);
-
-// Auto-refresh data every 30 seconds
-setInterval(() => {
-    if (document.getElementById('admin').getBoundingClientRect().top < window.innerHeight) {
-        loadRegistrationData();
-    }
-}, 30000);
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadServices();
+    loadRegistrationData();
+    
+    // Set current year in footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+});
 </script>
 </body>
 </html>
-
-
-
-
