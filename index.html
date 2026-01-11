@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PTSP LAPAS Kelas IIA Baubau</title>
+    <title>PTSP LAPAS Kelas IIA Baubau - Sistem Booking Kunjungan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -305,6 +305,107 @@
             background-color: #144c63;
         }
 
+        /* Booking Ticket */
+        .ticket-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            margin: 30px auto;
+            text-align: center;
+            border-top: 5px solid var(--primary-color);
+            display: none;
+        }
+
+        .ticket-header {
+            margin-bottom: 30px;
+        }
+
+        .ticket-header h3 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .ticket-code {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            letter-spacing: 5px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+
+        .ticket-details {
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ticket-row:last-child {
+            border-bottom: none;
+        }
+
+        .ticket-label {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .ticket-value {
+            color: #555;
+        }
+
+        .ticket-instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .ticket-instructions h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .ticket-instructions ul {
+            padding-left: 20px;
+            color: #666;
+        }
+
+        .ticket-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .print-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .print-btn:hover {
+            background-color: #e67e22;
+        }
+
         /* Information Section */
         .info-cards {
             display: grid;
@@ -378,6 +479,47 @@
 
         .data-table tr:hover {
             background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-waiting {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Verification Section */
+        .verification-section {
+            background-color: #f8f9fa;
+        }
+
+        .verification-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .verification-form {
+            margin-top: 30px;
         }
 
         /* Footer */
@@ -463,6 +605,26 @@
             border: 1px solid #f5c6cb;
         }
 
+        .message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .form-row {
@@ -503,8 +665,28 @@
                 font-size: 1.8rem;
             }
 
-            .form-container {
+            .form-container,
+            .verification-container,
+            .ticket-container {
                 padding: 25px;
+            }
+
+            .ticket-code {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+            }
+        }
+
+        @media print {
+            header, nav, .section-title, .cta-button, .admin-controls, footer, .print-btn {
+                display: none !important;
+            }
+            
+            .ticket-container {
+                box-shadow: none;
+                border: 2px solid #000;
+                margin: 0;
+                padding: 20px;
             }
         }
     </style>
@@ -514,7 +696,7 @@
     <header>
         <div class="container header-container">
             <div class="logo">
-                <!-- Logo placeholder - replace with actual logo -->
+                <!-- Logo placeholder -->
                 <div style="background-color: var(--primary-color); color: white; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
                     <i class="fas fa-balance-scale"></i>
                 </div>
@@ -533,6 +715,7 @@
                     <li><a href="#home" class="active">Beranda</a></li>
                     <li><a href="#services">Layanan WBP</a></li>
                     <li><a href="#registration">Pendaftaran Kunjungan</a></li>
+                    <li><a href="#verification">Cek Booking</a></li>
                     <li><a href="#information">Informasi</a></li>
                     <li><a href="#admin">Admin</a></li>
                 </ul>
@@ -558,8 +741,10 @@
             </div>
             
             <div class="services-container" id="servicesContainer">
-                <!-- Services will be loaded from Google Sheets -->
-                <div class="loading">Memuat data layanan...</div>
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Memuat data layanan...
+                </div>
             </div>
         </div>
     </section>
@@ -583,14 +768,14 @@
                         </div>
                         <div class="form-group">
                             <label for="nik">NIK <span style="color: red;">*</span></label>
-                            <input type="text" id="nik" name="nik" required>
+                            <input type="text" id="nik" name="nik" required minlength="16" maxlength="16">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email">
+                            <label for="email">Email <span style="color: red;">*</span></label>
+                            <input type="email" id="email" name="email" required>
                         </div>
                         <div class="form-group">
                             <label for="telepon">No. Telepon <span style="color: red;">*</span></label>
@@ -609,6 +794,10 @@
                             <select id="hubungan" name="hubungan" required>
                                 <option value="">Pilih hubungan</option>
                                 <option value="Keluarga">Keluarga</option>
+                                <option value="Orang Tua">Orang Tua</option>
+                                <option value="Suami/Istri">Suami/Istri</option>
+                                <option value="Anak">Anak</option>
+                                <option value="Saudara">Saudara</option>
                                 <option value="Pengacara">Pengacara</option>
                                 <option value="Teman">Teman</option>
                                 <option value="Lainnya">Lainnya</option>
@@ -627,11 +816,106 @@
                     
                     <div class="form-group">
                         <label for="keterangan">Keterangan Tambahan</label>
-                        <textarea id="keterangan" name="keterangan" rows="3"></textarea>
+                        <textarea id="keterangan" name="keterangan" rows="3" placeholder="Catatan atau informasi tambahan yang perlu disampaikan"></textarea>
                     </div>
                     
-                    <button type="submit" class="submit-btn">Kirim Pendaftaran</button>
+                    <div class="form-group" style="margin-top: 30px;">
+                        <label>
+                            <input type="checkbox" id="agreeTerms" required>
+                            Saya menyatakan bahwa data yang saya berikan adalah benar dan akan mematuhi semua peraturan yang berlaku di LAPAS Kelas IIA Baubau.
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Kirim Pendaftaran dan Dapatkan Kode Booking</button>
                 </form>
+            </div>
+            
+            <!-- Booking Ticket (akan muncul setelah pendaftaran berhasil) -->
+            <div class="ticket-container" id="ticketContainer">
+                <div class="ticket-header">
+                    <h3>Tiket Kunjungan LAPAS Baubau</h3>
+                    <p>Harap simpan dan tunjukkan tiket ini saat datang ke LAPAS</p>
+                </div>
+                
+                <div class="ticket-code" id="bookingCode">LAPAS-000001</div>
+                
+                <div class="ticket-details">
+                    <div class="ticket-row">
+                        <span class="ticket-label">Kode Booking:</span>
+                        <span class="ticket-value" id="ticketBookingCode">LAPAS-000001</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">Nama Pengunjung:</span>
+                        <span class="ticket-value" id="ticketNama">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">NIK:</span>
+                        <span class="ticket-value" id="ticketNIK">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">Tanggal Kunjungan:</span>
+                        <span class="ticket-value" id="ticketTanggal">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">Nama WBP:</span>
+                        <span class="ticket-value" id="ticketWBP">-</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">Status:</span>
+                        <span class="ticket-value" id="ticketStatus" style="font-weight: 600; color: var(--warning-color);">Menunggu Konfirmasi</span>
+                    </div>
+                    <div class="ticket-row">
+                        <span class="ticket-label">Tanggal Daftar:</span>
+                        <span class="ticket-value" id="ticketDaftar">-</span>
+                    </div>
+                </div>
+                
+                <div class="ticket-instructions">
+                    <h4>Instruksi Penting:</h4>
+                    <ul>
+                        <li>Tunjukkan tiket ini saat tiba di LAPAS</li>
+                        <li>Bawa dokumen asli (KTP/SIM) untuk verifikasi</li>
+                        <li>Datang 30 menit sebelum waktu kunjungan</li>
+                        <li>Patuhi semua peraturan dan tata tertib LAPAS</li>
+                        <li>Status kunjungan dapat berubah sesuai kebijakan petugas</li>
+                    </ul>
+                </div>
+                
+                <button class="print-btn" id="printTicket">
+                    <i class="fas fa-print"></i> Cetak Tiket
+                </button>
+                
+                <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Tiket ini juga telah dikirim ke email Anda
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verification Section -->
+    <section id="verification" class="verification-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Cek Status Booking</h2>
+                <p>Masukkan kode booking untuk memeriksa status pendaftaran kunjungan Anda</p>
+            </div>
+            
+            <div class="verification-container">
+                <div id="verificationMessage" class="message"></div>
+                
+                <div class="form-group">
+                    <label for="kodeBooking">Kode Booking</label>
+                    <input type="text" id="kodeBooking" name="kodeBooking" placeholder="Contoh: LAPAS-000001" style="text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
+                </div>
+                
+                <button id="checkBooking" class="submit-btn" style="margin-top: 20px;">
+                    <i class="fas fa-search"></i> Cek Status Booking
+                </button>
+                
+                <div id="verificationResult" style="margin-top: 30px; display: none;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 20px;">Hasil Pencarian</h3>
+                    <div id="resultContent"></div>
+                </div>
             </div>
         </div>
     </section>
@@ -648,7 +932,8 @@
                 <div class="info-card">
                     <i class="fas fa-clock"></i>
                     <h3>Jam Kunjungan</h3>
-                    <p>Senin - Jumat: 08:00 - 14:00 WITA</p>
+                    <p>Senin - Kamis: 08:00 - 14:00 WITA</p>
+                    <p>Jumat: 08:00 - 11:00 WITA</p>
                     <p>Sabtu: 08:00 - 12:00 WITA</p>
                     <p>Minggu & Hari Libur: Tutup</p>
                 </div>
@@ -656,9 +941,10 @@
                 <div class="info-card">
                     <i class="fas fa-file-alt"></i>
                     <h3>Persyaratan</h3>
-                    <p>Kartu Identitas (KTP/SIM)</p>
-                    <p>Surat Izin Kunjungan (jika diperlukan)</p>
+                    <p>Kartu Identitas (KTP/SIM) asli</p>
+                    <p>Tiket booking dari website</p>
                     <p>Mematuhi peraturan LAPAS</p>
+                    <p>Berpakaian sopan dan rapi</p>
                 </div>
                 
                 <div class="info-card">
@@ -667,6 +953,7 @@
                     <p>Telepon: (0402) 1234567</p>
                     <p>Email: ptsp@lapasbaubau.go.id</p>
                     <p>Alamat: Jl. Sudirman No. 45, Baubau</p>
+                    <p>Website: ptsp-lapas-baubau.go.id</p>
                 </div>
             </div>
         </div>
@@ -678,6 +965,7 @@
             <div class="section-title">
                 <h2>Panel Admin</h2>
                 <p>Data pendaftaran kunjungan dari Google Spreadsheet</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">Spreadsheet ID: <code>1ih0-dvFdsz41HGZTfXuPLqCetgiNU1MtSaYjhRDiR5s</code></p>
             </div>
             
             <div class="admin-controls">
@@ -685,9 +973,18 @@
                     <button id="refreshData" class="submit-btn" style="width: auto; padding: 10px 20px;">
                         <i class="fas fa-sync-alt"></i> Muat Ulang Data
                     </button>
+                    <button id="exportData" class="submit-btn" style="width: auto; padding: 10px 20px; margin-left: 10px; background-color: var(--success-color);">
+                        <i class="fas fa-download"></i> Export ke Excel
+                    </button>
                 </div>
-                <div>
-                    <input type="text" id="searchInput" placeholder="Cari data..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 250px;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="searchInput" placeholder="Cari data..." style="padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px;">
+                    <select id="statusFilter" style="padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">Semua Status</option>
+                        <option value="Menunggu">Menunggu</option>
+                        <option value="Disetujui">Disetujui</option>
+                        <option value="Ditolak">Ditolak</option>
+                    </select>
                 </div>
             </div>
             
@@ -696,26 +993,27 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>Kode Booking</th>
                             <th>Nama</th>
                             <th>NIK</th>
                             <th>Telepon</th>
                             <th>Tanggal Kunjungan</th>
                             <th>Nama WBP</th>
                             <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="7">Memuat data dari spreadsheet...</td>
+                            <td colspan="9" class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Memuat data dari spreadsheet...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
-            <div style="text-align: center;">
-                <p>Spreadsheet ID: <code>1ih0-dvFdsz41HGZTfXuPLqCetgiNU1MtSaYjhRDiR5s</code></p>
-                <p>Data akan terintegrasi secara otomatis dengan Google Spreadsheet</p>
-            </div>
+            <div id="pagination" style="display: flex; justify-content: center; margin-top: 20px; gap: 10px;"></div>
         </div>
     </section>
 
@@ -735,6 +1033,7 @@
                         <li><a href="#home">Beranda</a></li>
                         <li><a href="#services">Layanan WBP</a></li>
                         <li><a href="#registration">Pendaftaran Kunjungan</a></li>
+                        <li><a href="#verification">Cek Booking</a></li>
                         <li><a href="#information">Informasi</a></li>
                     </ul>
                 </div>
@@ -745,17 +1044,27 @@
                         <li><i class="fas fa-phone"></i> (0402) 1234567</li>
                         <li><i class="fas fa-envelope"></i> ptsp@lapasbaubau.go.id</li>
                         <li><i class="fas fa-clock"></i> Senin - Jumat: 08:00 - 16:00 WITA</li>
+                        <li><i class="fas fa-globe"></i> ptsp-lapas-baubau.go.id</li>
                     </ul>
                 </div>
             </div>
             
             <div class="copyright">
-                <p>&copy; 2023 PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
+                <p>&copy; <span id="currentYear">2023</span> PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Script untuk integrasi dengan Google Spreadsheet -->
     <script>
+        // Konfigurasi Google Spreadsheet
+        const SPREADSHEET_ID = '1ih0-dvFdsz41HGZTfXuPLqCetgiNU1MtSaYjhRDiR5s';
+        const API_KEY = 'AIzaSyB7QXO7VwlYx7m2d7N4S8K3vq6E6QzXG6M'; // Ganti dengan API key Anda
+        const SHEET_NAME = 'pendaftaran';
+        
+        // URL untuk Google Sheets API
+        const SHEET_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+        
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navMenu = document.getElementById('navMenu');
@@ -789,16 +1098,53 @@
             });
         });
         
-        // Set minimum date for registration form (today)
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('tanggal').min = today;
+        // Set minimum date for registration form (today + 1 day)
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+        document.getElementById('tanggal').min = tomorrowFormatted;
+        
+        // Set maximum date (30 days from now)
+        const maxDate = new Date();
+        maxDate.setDate(maxDate.getDate() + 30);
+        const maxDateFormatted = maxDate.toISOString().split('T')[0];
+        document.getElementById('tanggal').max = maxDateFormatted;
+        
+        // Format tanggal untuk display
+        function formatDate(dateString) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', options);
+        }
+        
+        // Generate booking code
+        function generateBookingCode() {
+            const prefix = "LAPAS-";
+            const randomNum = Math.floor(Math.random() * 900000) + 100000;
+            return prefix + randomNum;
+        }
+        
+        // Generate verification code (6 digits)
+        function generateVerificationCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
         
         // Form submission
         const registrationForm = document.getElementById('registrationForm');
         const formMessage = document.getElementById('formMessage');
+        const ticketContainer = document.getElementById('ticketContainer');
         
         registrationForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Validasi NIK (16 digit)
+            const nik = document.getElementById('nik').value;
+            if (nik.length !== 16 || isNaN(nik)) {
+                formMessage.textContent = "NIK harus 16 digit angka!";
+                formMessage.className = "message error";
+                formMessage.style.display = "block";
+                return;
+            }
             
             // Disable submit button to prevent multiple submissions
             const submitBtn = this.querySelector('.submit-btn');
@@ -806,54 +1152,220 @@
             submitBtn.textContent = 'Mengirim...';
             submitBtn.disabled = true;
             
+            // Generate booking and verification codes
+            const bookingCode = generateBookingCode();
+            const verificationCode = generateVerificationCode();
+            const tanggalDaftar = new Date().toLocaleDateString('id-ID');
+            
             // Collect form data
             const formData = {
+                booking_id: bookingCode,
+                tanggal_daftar: tanggalDaftar,
                 nama: document.getElementById('nama').value,
-                nik: document.getElementById('nik').value,
+                nik: nik,
                 email: document.getElementById('email').value,
                 telepon: document.getElementById('telepon').value,
                 alamat: document.getElementById('alamat').value,
                 hubungan: document.getElementById('hubungan').value,
-                tanggal: document.getElementById('tanggal').value,
+                tanggal_kunjungan: document.getElementById('tanggal').value,
                 nama_wbp: document.getElementById('nama_wbp').value,
                 keterangan: document.getElementById('keterangan').value,
                 status: "Menunggu",
-                tanggal_daftar: new Date().toLocaleDateString('id-ID')
+                kode_verifikasi: verificationCode
             };
             
-            // In a real implementation, this would send data to Google Apps Script
-            // For demo purposes, we'll simulate the submission
+            try {
+                // Simpan ke Google Sheets (simulasi - dalam implementasi nyata perlu menggunakan Google Apps Script)
+                await saveToGoogleSheets(formData);
+                
+                // Show success message
+                formMessage.textContent = "Pendaftaran berhasil! Kode booking telah dibuat.";
+                formMessage.className = "message success";
+                formMessage.style.display = "block";
+                
+                // Show booking ticket
+                displayBookingTicket(formData);
+                
+                // Scroll to ticket
+                setTimeout(() => {
+                    ticketContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+                
+                // Reset form
+                registrationForm.reset();
+                
+                // Refresh admin table
+                loadRegistrationData();
+                
+            } catch (error) {
+                formMessage.textContent = "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.";
+                formMessage.className = "message error";
+                formMessage.style.display = "block";
+                console.error('Error:', error);
+            } finally {
+                // Restore submit button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // Simulate saving to Google Sheets
+        async function saveToGoogleSheets(data) {
+            // In a real implementation, this would send data to Google Sheets API
+            // For demo purposes, we'll save to localStorage and simulate API call
             
             // Simulate API call delay
             await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Show success message
-            formMessage.textContent = "Pendaftaran berhasil dikirim! Data telah disimpan ke spreadsheet.";
-            formMessage.className = "message success";
-            formMessage.style.display = "block";
+            // Save to localStorage for demo
+            let registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
+            data.id = Date.now(); // Add unique ID
+            registrations.push(data);
+            localStorage.setItem('lapasRegistrations', JSON.stringify(registrations));
             
-            // Reset form
-            registrationForm.reset();
+            // Simulate sending email
+            simulateEmailNotification(data);
             
-            // Restore submit button
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
+            return { success: true, message: 'Data berhasil disimpan' };
+        }
+        
+        // Display booking ticket
+        function displayBookingTicket(data) {
+            document.getElementById('bookingCode').textContent = data.booking_id;
+            document.getElementById('ticketBookingCode').textContent = data.booking_id;
+            document.getElementById('ticketNama').textContent = data.nama;
+            document.getElementById('ticketNIK').textContent = data.nik;
+            document.getElementById('ticketTanggal').textContent = formatDate(data.tanggal_kunjungan);
+            document.getElementById('ticketWBP').textContent = data.nama_wbp;
+            document.getElementById('ticketDaftar').textContent = data.tanggal_daftar;
             
-            // Refresh admin data
-            loadRegistrationData();
-            
-            // Hide message after 5 seconds
-            setTimeout(() => {
-                formMessage.style.display = "none";
-            }, 5000);
+            ticketContainer.style.display = 'block';
+        }
+        
+        // Print ticket
+        document.getElementById('printTicket').addEventListener('click', function() {
+            window.print();
         });
         
-        // Load services from Google Sheets (simulated)
+        // Check booking status
+        document.getElementById('checkBooking').addEventListener('click', function() {
+            const bookingCode = document.getElementById('kodeBooking').value.trim();
+            const messageDiv = document.getElementById('verificationMessage');
+            const resultDiv = document.getElementById('verificationResult');
+            const resultContent = document.getElementById('resultContent');
+            
+            if (!bookingCode) {
+                messageDiv.textContent = "Masukkan kode booking terlebih dahulu!";
+                messageDiv.className = "message error";
+                messageDiv.style.display = "block";
+                resultDiv.style.display = "none";
+                return;
+            }
+            
+            // Search for booking
+            const registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
+            const booking = registrations.find(r => r.booking_id === bookingCode);
+            
+            if (booking) {
+                messageDiv.textContent = "Data booking ditemukan!";
+                messageDiv.className = "message success";
+                messageDiv.style.display = "block";
+                
+                // Determine status color
+                let statusColor = 'var(--warning-color)';
+                let statusText = booking.status;
+                
+                if (booking.status === 'Disetujui') {
+                    statusColor = 'var(--success-color)';
+                } else if (booking.status === 'Ditolak') {
+                    statusColor = 'var(--danger-color)';
+                }
+                
+                resultContent.innerHTML = `
+                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>Kode Booking:</strong>
+                            <span>${booking.booking_id}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>Nama:</strong>
+                            <span>${booking.nama}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>Tanggal Kunjungan:</strong>
+                            <span>${formatDate(booking.tanggal_kunjungan)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>Nama WBP:</strong>
+                            <span>${booking.nama_wbp}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <strong>Status:</strong>
+                            <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                        </div>
+                        ${booking.keterangan ? `
+                        <div style="margin-top: 15px;">
+                            <strong>Keterangan:</strong>
+                            <p style="margin-top: 5px;">${booking.keterangan}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button id="printBookingInfo" class="print-btn" style="padding: 10px 20px;">
+                            <i class="fas fa-print"></i> Cetak Informasi
+                        </button>
+                    </div>
+                `;
+                
+                resultDiv.style.display = 'block';
+                
+                // Add event listener for print button
+                setTimeout(() => {
+                    document.getElementById('printBookingInfo').addEventListener('click', function() {
+                        const printWindow = window.open('', '_blank');
+                        printWindow.document.write(`
+                            <html>
+                            <head>
+                                <title>Status Booking ${booking.booking_id}</title>
+                                <style>
+                                    body { font-family: Arial, sans-serif; padding: 20px; }
+                                    h1 { color: #1a5f7a; }
+                                    .info { margin: 15px 0; }
+                                    .label { font-weight: bold; }
+                                    .status { font-weight: bold; color: ${statusColor}; }
+                                </style>
+                            </head>
+                            <body>
+                                <h1>Status Booking LAPAS Baubau</h1>
+                                <div class="info"><span class="label">Kode Booking:</span> ${booking.booking_id}</div>
+                                <div class="info"><span class="label">Nama:</span> ${booking.nama}</div>
+                                <div class="info"><span class="label">Tanggal Kunjungan:</span> ${formatDate(booking.tanggal_kunjungan)}</div>
+                                <div class="info"><span class="label">Nama WBP:</span> ${booking.nama_wbp}</div>
+                                <div class="info"><span class="label">Status:</span> <span class="status">${booking.status}</span></div>
+                                <p style="margin-top: 30px; font-size: 0.9em; color: #666;">
+                                    Dicetak pada: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}
+                                </p>
+                            </body>
+                            </html>
+                        `);
+                        printWindow.document.close();
+                        printWindow.print();
+                    });
+                }, 100);
+                
+            } else {
+                messageDiv.textContent = "Kode booking tidak ditemukan!";
+                messageDiv.className = "message error";
+                messageDiv.style.display = "block";
+                resultDiv.style.display = "none";
+            }
+        });
+        
+        // Load services
         async function loadServices() {
             const servicesContainer = document.getElementById('servicesContainer');
             
-            // In a real implementation, this would fetch from Google Sheets API
-            // For demo, we'll use static data
+            // Demo services data
             const services = [
                 {
                     icon: "fas fa-user-friends",
@@ -907,60 +1419,116 @@
             });
         }
         
-        // Load registration data from Google Sheets (simulated)
+        // Load registration data
         async function loadRegistrationData() {
             const tableBody = document.getElementById('tableBody');
             
-            // In a real implementation, this would fetch from Google Sheets API
-            // For demo, we'll generate mock data
-            const mockData = [
-                { nama: "Ahmad Santoso", nik: "1234567890123456", telepon: "081234567890", tanggal: "2023-10-15", nama_wbp: "Budi Prasetyo", status: "Disetujui" },
-                { nama: "Siti Rahayu", nik: "2345678901234567", telepon: "082345678901", tanggal: "2023-10-18", nama_wbp: "Joko Widodo", status: "Menunggu" },
-                { nama: "Rina Wulandari", nik: "3456789012345678", telepon: "083456789012", tanggal: "2023-10-20", nama_wbp: "Ahmad Yani", status: "Disetujui" },
-                { nama: "Bambang Sugianto", nik: "4567890123456789", telepon: "084567890123", tanggal: "2023-10-22", nama_wbp: "Surya Dharma", status: "Ditolak" },
-                { nama: "Dewi Kurnia", nik: "5678901234567890", telepon: "085678901234", tanggal: "2023-10-25", nama_wbp: "Mulyadi", status: "Menunggu" }
-            ];
+            // Show loading
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat data dari spreadsheet...
+                    </td>
+                </tr>
+            `;
             
-            // Clear table
-            tableBody.innerHTML = '';
-            
-            // Populate table with data
-            mockData.forEach((item, index) => {
-                const row = document.createElement('tr');
+            // Get data from localStorage for demo
+            setTimeout(() => {
+                const registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
                 
-                // Determine status color
-                let statusColor = '';
-                if (item.status === 'Disetujui') statusColor = 'color: var(--success-color);';
-                if (item.status === 'Menunggu') statusColor = 'color: var(--warning-color);';
-                if (item.status === 'Ditolak') statusColor = 'color: var(--danger-color);';
+                // Apply filters
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
                 
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.nama}</td>
-                    <td>${item.nik}</td>
-                    <td>${item.telepon}</td>
-                    <td>${item.tanggal}</td>
-                    <td>${item.nama_wbp}</td>
-                    <td style="font-weight: 500; ${statusColor}">${item.status}</td>
-                `;
-                tableBody.appendChild(row);
-            });
+                let filteredData = registrations;
+                
+                if (searchTerm) {
+                    filteredData = filteredData.filter(item => 
+                        item.nama.toLowerCase().includes(searchTerm) ||
+                        item.booking_id.toLowerCase().includes(searchTerm) ||
+                        item.nik.includes(searchTerm) ||
+                        item.nama_wbp.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                if (statusFilter) {
+                    filteredData = filteredData.filter(item => item.status === statusFilter);
+                }
+                
+                // Clear table
+                tableBody.innerHTML = '';
+                
+                if (filteredData.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-database"></i> Tidak ada data ditemukan
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                filteredData.sort((a, b) => b.id - a.id);
+                
+                // Populate table with data
+                filteredData.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    
+                    // Determine status badge
+                    let statusBadge = '';
+                    if (item.status === 'Menunggu') {
+                        statusBadge = `<span class="status-badge status-waiting">${item.status}</span>`;
+                    } else if (item.status === 'Disetujui') {
+                        statusBadge = `<span class="status-badge status-approved">${item.status}</span>`;
+                    } else if (item.status === 'Ditolak') {
+                        statusBadge = `<span class="status-badge status-rejected">${item.status}</span>`;
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><strong>${item.booking_id}</strong></td>
+                        <td>${item.nama}</td>
+                        <td>${item.nik}</td>
+                        <td>${item.telepon}</td>
+                        <td>${formatDate(item.tanggal_kunjungan)}</td>
+                        <td>${item.nama_wbp}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button onclick="updateStatus('${item.booking_id}', 'Disetujui')" class="status-btn" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; font-size: 0.8rem;">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button onclick="updateStatus('${item.booking_id}', 'Ditolak')" class="status-btn" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }, 1000);
         }
         
-        // Search functionality for admin table
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
+        // Update status function (accessible globally)
+        window.updateStatus = function(bookingId, newStatus) {
+            const registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
+            const index = registrations.findIndex(r => r.booking_id === bookingId);
             
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
+            if (index !== -1) {
+                registrations[index].status = newStatus;
+                localStorage.setItem('lapasRegistrations', JSON.stringify(registrations));
+                
+                // Show confirmation
+                alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
+                
+                // Reload data
+                loadRegistrationData();
+            }
+        };
+        
+        // Search functionality for admin table
+        document.getElementById('searchInput').addEventListener('input', loadRegistrationData);
+        document.getElementById('statusFilter').addEventListener('change', loadRegistrationData);
         
         // Refresh data button
         document.getElementById('refreshData').addEventListener('click', function() {
@@ -976,13 +1544,92 @@
             }, 2000);
         });
         
+        // Export data button
+        document.getElementById('exportData').addEventListener('click', function() {
+            const registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
+            
+            if (registrations.length === 0) {
+                alert('Tidak ada data untuk diexport!');
+                return;
+            }
+            
+            // Convert to CSV
+            const headers = ['booking_id', 'tanggal_daftar', 'nama', 'nik', 'email', 'telepon', 'alamat', 'hubungan', 'tanggal_kunjungan', 'nama_wbp', 'keterangan', 'status', 'kode_verifikasi'];
+            const csv = [
+                headers.join(','),
+                ...registrations.map(row => headers.map(header => JSON.stringify(row[header] || '')).join(','))
+            ].join('\n');
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `data-pendaftaran-lapas-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        });
+        
+        // Simulate email notification
+        function simulateEmailNotification(data) {
+            console.log(`Email terkirim ke ${data.email} dengan kode booking: ${data.booking_id}`);
+            // In real implementation, this would send an actual email
+        }
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadServices();
             loadRegistrationData();
             
             // Set current year in footer
-            document.querySelector('.copyright p').innerHTML = `&copy; ${new Date().getFullYear()} PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.`;
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Add sample data for demo if empty
+            setTimeout(() => {
+                const registrations = JSON.parse(localStorage.getItem('lapasRegistrations') || '[]');
+                if (registrations.length === 0) {
+                    // Add some sample data for demo
+                    const sampleData = [
+                        {
+                            id: 1,
+                            booking_id: 'LAPAS-100001',
+                            tanggal_daftar: '10 Oktober 2023',
+                            nama: 'Ahmad Santoso',
+                            nik: '1234567890123456',
+                            email: 'ahmad@example.com',
+                            telepon: '081234567890',
+                            alamat: 'Jl. Merdeka No. 10, Baubau',
+                            hubungan: 'Keluarga',
+                            tanggal_kunjungan: '2023-10-20',
+                            nama_wbp: 'Budi Prasetyo',
+                            keterangan: 'Membawa paket makanan',
+                            status: 'Disetujui',
+                            kode_verifikasi: '123456'
+                        },
+                        {
+                            id: 2,
+                            booking_id: 'LAPAS-100002',
+                            tanggal_daftar: '11 Oktober 2023',
+                            nama: 'Siti Rahayu',
+                            nik: '2345678901234567',
+                            email: 'siti@example.com',
+                            telepon: '082345678901',
+                            alamat: 'Jl. Sudirman No. 45, Baubau',
+                            hubungan: 'Orang Tua',
+                            tanggal_kunjungan: '2023-10-22',
+                            nama_wbp: 'Joko Widodo',
+                            keterangan: '',
+                            status: 'Menunggu',
+                            kode_verifikasi: '234567'
+                        }
+                    ];
+                    
+                    localStorage.setItem('lapasRegistrations', JSON.stringify(sampleData));
+                    loadRegistrationData();
+                }
+            }, 1000);
         });
     </script>
 </body>
