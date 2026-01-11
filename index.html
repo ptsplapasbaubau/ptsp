@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PTSP LAPAS KELAS IIA BAUBAU</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tambahkan library QR Code -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         :root {
@@ -348,21 +347,6 @@
             letter-spacing: 5px;
         }
         
-        .barcode-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .barcode {
-            font-family: monospace;
-            font-size: 1.5rem;
-            letter-spacing: 3px;
-            background-color: white;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            border: 1px dashed #ccc;
-        }
-        
         /* QR Code Container */
         .qrcode-container {
             text-align: center;
@@ -371,6 +355,7 @@
             background-color: white;
             border-radius: var(--border-radius);
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border: 2px dashed #1a4d8c;
         }
         
         #qrcode {
@@ -378,30 +363,31 @@
             padding: 15px;
             background-color: white;
             border-radius: 10px;
-            border: 2px solid #eaeaea;
         }
         
         .qrcode-label {
             display: block;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #666;
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #1a4d8c;
+            font-weight: 500;
         }
         
         .instructions {
             background-color: #fff8e1;
-            padding: 15px;
+            padding: 20px;
             border-radius: var(--border-radius);
             margin-top: 20px;
             font-size: 0.95rem;
+            border-left: 4px solid var(--warning-color);
         }
         
         /* Download Buttons */
         .download-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 25px;
             flex-wrap: wrap;
         }
         
@@ -409,7 +395,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             background-color: var(--primary-color);
             color: white;
             border-radius: var(--border-radius);
@@ -423,6 +409,7 @@
         .download-btn:hover {
             background-color: var(--accent-color);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .download-btn.secondary {
@@ -616,7 +603,7 @@
         }
         
         @media print {
-            header, nav, .sidebar, footer, .btn {
+            header, nav, .sidebar, footer, .btn, .download-buttons {
                 display: none !important;
             }
             
@@ -626,10 +613,16 @@
                 border: 2px solid #000;
                 margin: 0;
                 padding: 20px;
+                page-break-inside: avoid;
             }
             
-            #qrcode {
-                border: 1px solid #000 !important;
+            .qrcode-container {
+                border: 2px solid #000 !important;
+                page-break-inside: avoid;
+            }
+            
+            .instructions {
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -736,7 +729,7 @@
                 <!-- Booking Section -->
                 <section class="booking-section" id="booking">
                     <h2 class="section-title">Pendaftaran Kunjungan Online</h2>
-                    <p>Isi formulir pendaftaran di bawah ini untuk mendapatkan kode booking kunjungan. Tunjukkan kode booking saat datang ke LAPAS untuk proses yang lebih cepat.</p>
+                    <p>Isi formulir pendaftaran di bawah ini untuk mendapatkan kode booking kunjungan. Tunjukkan QR Code saat datang ke LAPAS untuk verifikasi cepat.</p>
                     
                     <form id="bookingForm">
                         <div class="form-row">
@@ -814,28 +807,23 @@
                     
                     <div class="booking-result" id="bookingResult">
                         <h3 style="color: var(--success-color); margin-bottom: 15px;"><i class="fas fa-check-circle"></i> Pendaftaran Berhasil!</h3>
-                        <p>Pendaftaran kunjungan Anda telah berhasil. Silakan catat kode booking berikut dan tunjukkan saat datang ke LAPAS Kelas IIA Baubau.</p>
+                        <p>Pendaftaran kunjungan Anda telah berhasil. Silakan catat kode booking berikut dan tunjukkan QR Code saat datang ke LAPAS Kelas IIA Baubau.</p>
                         
                         <div class="booking-code" id="bookingCodeDisplay">PTSP-BAU-XXXXXX</div>
                         
                         <!-- QR Code Container -->
                         <div class="qrcode-container">
                             <div id="qrcode"></div>
-                            <span class="qrcode-label">Scan QR Code di atas untuk verifikasi cepat</span>
-                        </div>
-                        
-                        <!-- Barcode (Backup) -->
-                        <div class="barcode-container">
-                            <div class="barcode" id="barcodeDisplay">|| | | || | || | | ||</div>
-                            <span style="font-size: 0.9rem; color: #666;">Atau gunakan barcode di atas jika QR Code tidak terbaca</span>
+                            <span class="qrcode-label"><i class="fas fa-qrcode"></i> SCAN QR CODE INI UNTUK VERIFIKASI CEPAT</span>
                         </div>
                         
                         <div class="instructions">
                             <h4><i class="fas fa-info-circle"></i> Instruksi Penting:</h4>
                             <ul style="margin-top: 10px; padding-left: 20px;">
-                                <li>Tunjukkan <strong>QR Code</strong> atau <strong>kode booking</strong> kepada petugas pendaftaran</li>
+                                <li>Tunjukkan <strong>QR Code di atas</strong> kepada petugas pendaftaran untuk scan cepat</li>
+                                <li>Bisa juga menunjukkan <strong>kode booking: <span id="bookingCodeText">PTSP-BAU-XXXXXX</span></strong></li>
                                 <li>Datang <strong>30 menit sebelum</strong> waktu kunjungan yang dijadwalkan</li>
-                                <li>Bawa dokumen identitas asli (KTP) untuk verifikasi</li>
+                                <li>Bawa dokumen identitas asli (KTP) untuk verifikasi tambahan</li>
                                 <li>Patuhi semua peraturan dan tata tertib LAPAS selama kunjungan</li>
                                 <li>Kode booking ini berlaku hanya untuk satu kali kunjungan</li>
                             </ul>
@@ -920,7 +908,7 @@
     </footer>
 
     <script>
-        // GANTI URL INI DENGAN URL WEB APP ANDA
+        // URL Google Apps Script Anda
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJR94d6Oq0OwDTYqoCDvYVmpsG955FtAjqPWlXTti0vOjlLNbW9dYOTjBGRfyeLcja/exec';
         
         // Set minimum date to today for booking form
@@ -958,17 +946,6 @@
             return result;
         }
         
-        // Generate barcode-like string
-        function generateBarcode() {
-            const barcodeChars = '| |';
-            let barcode = '';
-            for (let i = 0; i < 20; i++) {
-                const randomChar = Math.random() > 0.5 ? '|' : ' ';
-                barcode += randomChar;
-            }
-            return barcode;
-        }
-        
         // Generate QR Code
         function generateQRCode(bookingCode, additionalData = {}) {
             try {
@@ -979,7 +956,8 @@
                 const qrData = {
                     bookingCode: bookingCode,
                     timestamp: new Date().toISOString(),
-                    url: window.location.href,
+                    system: "PTSP_LAPAS_BAUBAU",
+                    url: "https://ptsplapasbaubau.vercel.app",
                     ...additionalData
                 };
                 
@@ -988,8 +966,8 @@
                 
                 // Generate QR Code
                 QRCode.toCanvas(document.getElementById('qrcode'), qrString, {
-                    width: 200,
-                    height: 200,
+                    width: 250,
+                    height: 250,
                     colorDark: "#1a4d8c",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
@@ -999,8 +977,8 @@
                         // Fallback: Generate dengan text saja
                         document.getElementById('qrcode').innerHTML = '';
                         QRCode.toCanvas(document.getElementById('qrcode'), bookingCode, {
-                            width: 200,
-                            height: 200,
+                            width: 250,
+                            height: 250,
                             colorDark: "#1a4d8c",
                             colorLight: "#ffffff"
                         });
@@ -1013,9 +991,10 @@
                 console.error('Error generating QR Code:', error);
                 // Simple fallback
                 document.getElementById('qrcode').innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 24px; font-weight: bold; color: #1a4d8c;">${bookingCode}</div>
-                        <div style="font-size: 12px; color: #666; margin-top: 10px;">(QR Code tidak tersedia)</div>
+                    <div style="text-align: center; padding: 20px; width: 250px; height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: white; border-radius: 10px; border: 2px solid #1a4d8c;">
+                        <div style="font-size: 32px; font-weight: bold; color: #1a4d8c; margin-bottom: 10px;">${bookingCode}</div>
+                        <div style="font-size: 14px; color: #666;">PTSP LAPAS BAUBAU</div>
+                        <div style="font-size: 12px; color: #999; margin-top: 5px;">(QR Code tidak tersedia)</div>
                     </div>
                 `;
             }
@@ -1032,7 +1011,7 @@
                 
                 const bookingCode = document.getElementById('bookingCodeDisplay').textContent;
                 const link = document.createElement('a');
-                link.download = `QRCode-${bookingCode}.png`;
+                link.download = `Tiket-LAPAS-${bookingCode}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
@@ -1059,27 +1038,19 @@
                     link.href = dataUrl;
                     link.download = `Tiket-LAPAS-${bookingCode}.png`;
                     
-                    // Simulate click on mobile
-                    if (navigator.share) {
-                        // Use Web Share API if available
-                        navigator.share({
-                            title: `Tiket LAPAS - ${bookingCode}`,
-                            text: `Kode booking LAPAS: ${bookingCode}`,
-                            files: [new File([dataUrl], `Tiket-LAPAS-${bookingCode}.png`, { type: 'image/png' })]
-                        }).then(() => {
-                            showNotification('Tiket berhasil dibagikan', 'success');
-                        }).catch(err => {
-                            console.log('Share failed:', err);
-                            link.click();
-                        });
+                    // For mobile devices
+                    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                        showNotification('Screenshot QR Code dan simpan di galeri', 'info');
                     } else {
                         link.click();
-                        showNotification('Tiket berhasil disimpan di galeri', 'success');
+                        showNotification('QR Code berhasil disimpan', 'success');
                     }
+                } else {
+                    showNotification('Ambil screenshot halaman ini untuk menyimpan tiket', 'info');
                 }
             } catch (error) {
                 console.error('Error saving to phone:', error);
-                showNotification('Simpan QR Code manual melalui screenshot', 'info');
+                showNotification('Ambil screenshot halaman ini untuk menyimpan tiket', 'info');
             }
         }
         
@@ -1170,12 +1141,18 @@
                 return;
             }
             
+            // Validasi tanggal (tidak boleh hari ini)
+            const today = new Date().toISOString().split('T')[0];
+            if (formData.tanggal <= today) {
+                showNotification('Tanggal kunjungan harus minimal besok', 'error');
+                return;
+            }
+            
             // Show loading
             showLoading(true);
             
             // Generate booking code
             const bookingCode = generateBookingCode();
-            const barcode = generateBarcode();
             
             try {
                 // Kirim data ke Google Apps Script
@@ -1209,14 +1186,15 @@
                     // Display booking result
                     const finalBookingCode = result.bookingCode || bookingCode;
                     document.getElementById('bookingCodeDisplay').textContent = finalBookingCode;
-                    document.getElementById('barcodeDisplay').textContent = barcode;
+                    document.getElementById('bookingCodeText').textContent = finalBookingCode;
                     
                     // Generate QR Code dengan data lengkap
                     generateQRCode(finalBookingCode, {
                         nama: formData.nama,
                         tanggal: formData.tanggal,
                         namaWbp: formData.namaWbp,
-                        jenisKunjungan: formData.jenisKunjungan
+                        jenisKunjungan: formData.jenisKunjungan,
+                        telepon: formData.telepon.substring(formData.telepon.length - 4)
                     });
                     
                     // Show booking result
@@ -1248,7 +1226,7 @@
                 
                 // Display booking result dengan warning
                 document.getElementById('bookingCodeDisplay').textContent = bookingCode;
-                document.getElementById('barcodeDisplay').textContent = barcode;
+                document.getElementById('bookingCodeText').textContent = bookingCode;
                 
                 // Generate QR Code
                 generateQRCode(bookingCode, {
@@ -1256,6 +1234,7 @@
                     tanggal: formData.tanggal,
                     namaWbp: formData.namaWbp,
                     jenisKunjungan: formData.jenisKunjungan,
+                    telepon: formData.telepon.substring(formData.telepon.length - 4),
                     note: 'DATA LOKAL - BELUM SYNC'
                 });
                 
@@ -1345,32 +1324,6 @@
                         <p><strong>Status:</strong> <span style="color: #155724; background-color: #c3e6cb; padding: 2px 8px; border-radius: 3px; font-weight: bold;">${result.status}</span></p>
                         <p><strong>Tanggal Daftar:</strong> ${result.tanggalDaftar}</p>
                     `;
-                    
-                    // Generate mini QR Code untuk status
-                    setTimeout(() => {
-                        if (result.bookingCode) {
-                            const miniQRContainer = document.createElement('div');
-                            miniQRContainer.style.marginTop = '10px';
-                            miniQRContainer.style.textAlign = 'center';
-                            miniQRContainer.innerHTML = '<small>QR Code untuk status:</small><br>';
-                            const miniQR = document.createElement('div');
-                            miniQR.id = 'miniQR';
-                            miniQR.style.display = 'inline-block';
-                            miniQRContainer.appendChild(miniQR);
-                            statusResult.appendChild(miniQRContainer);
-                            
-                            QRCode.toCanvas(miniQR, JSON.stringify({
-                                bookingCode: result.bookingCode,
-                                status: result.status,
-                                checkTime: new Date().toISOString()
-                            }), {
-                                width: 100,
-                                height: 100,
-                                colorDark: "#1a4d8c",
-                                colorLight: "#ffffff"
-                            });
-                        }
-                    }, 100);
                     
                 } else {
                     statusResult.className = 'status-result error';
@@ -1472,7 +1425,7 @@
                                 timestamp: new Date().toISOString()
                             });
                             
-                            await fetch(SCRIPT_URL, {
+                            const response = await fetch(SCRIPT_URL, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1480,10 +1433,12 @@
                                 body: payload
                             });
                             
-                            // Mark as synced
-                            const index = bookings.findIndex(b => b.bookingCode === booking.bookingCode);
-                            if (index !== -1) {
-                                bookings[index].synced = true;
+                            if (response.ok) {
+                                // Mark as synced
+                                const index = bookings.findIndex(b => b.bookingCode === booking.bookingCode);
+                                if (index !== -1) {
+                                    bookings[index].synced = true;
+                                }
                             }
                             
                         } catch (syncError) {
@@ -1493,6 +1448,10 @@
                     
                     // Update localStorage
                     localStorage.setItem('ptspBookings', JSON.stringify(bookings));
+                    
+                    if (unsynced.some(b => b.synced)) {
+                        console.log('Local data synced successfully');
+                    }
                 }
             } catch (error) {
                 console.error('Auto-sync error:', error);
