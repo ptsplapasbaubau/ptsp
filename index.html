@@ -1136,11 +1136,58 @@
         document.getElementById('tanggal').max = maxDateFormatted;
 
         // Format tanggal untuk display
-        function formatDate(dateString) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', options);
+// Format tanggal untuk display (VERSI DIPERBAIKI)
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    
+    try {
+        let date;
+        
+        // Coba parse berbagai format tanggal
+        if (dateString.includes('/')) {
+            // Format dd/MM/yyyy
+            const parts = dateString.split('/');
+            if (parts.length === 3) {
+                date = new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+        } else if (dateString.includes('-')) {
+            // Format yyyy-MM-dd atau dd-MM-yyyy
+            const parts = dateString.split('-');
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    // yyyy-MM-dd
+                    date = new Date(parts[0], parts[1] - 1, parts[2]);
+                } else {
+                    // dd-MM-yyyy
+                    date = new Date(parts[2], parts[1] - 1, parts[0]);
+                }
+            }
         }
+        
+        // Jika parsing gagal, coba parse langsung
+        if (!date || isNaN(date.getTime())) {
+            date = new Date(dateString);
+        }
+        
+        // Jika masih tidak valid, return string asli
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        };
+        
+        return date.toLocaleDateString('id-ID', options);
+        
+    } catch (error) {
+        console.error('Error formatting date:', error, dateString);
+        return dateString;
+    }
+}
 
         // Fungsi untuk generate QR Code
         function generateQRCode(bookingCode) {
@@ -1725,4 +1772,5 @@ window.updateStatus = async function(bookingId, newStatus) {
     </script>
 </body>
 </html>
+
 
