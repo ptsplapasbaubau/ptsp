@@ -1533,32 +1533,56 @@
             }
         }
 
-        // Update status function
-        window.updateStatus = async function(bookingId, newStatus) {
-            if (!bookingId || bookingId === '-') {
-                alert('Booking ID tidak valid');
-                return;
-            }
+        // Update status function (VERSI DIPERBAIKI)
+window.updateStatus = async function(bookingId, newStatus) {
+    if (!bookingId || bookingId === '-') {
+        alert('Booking ID tidak valid');
+        return;
+    }
+    
+    if (!confirm(`Apakah Anda yakin ingin mengubah status booking ${bookingId} menjadi "${newStatus}"?`)) {
+        return;
+    }
+    
+    try {
+        // Encode booking ID untuk URL
+        const encodedBookingId = encodeURIComponent(bookingId);
+        const encodedStatus = encodeURIComponent(newStatus);
+        
+        const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodedBookingId}&status=${encodedStatus}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
             
-            if (!confirm(`Apakah Anda yakin ingin mengubah status booking ${bookingId} menjadi "${newStatus}"?`)) {
-                return;
-            }
+            // Refresh data tabel
+            loadRegistrationData();
             
-            try {
-                const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodeURIComponent(bookingId)}&status=${encodeURIComponent(newStatus)}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
-                    loadRegistrationData();
-                } else {
-                    alert(`Gagal mengubah status: ${result.message}`);
+            // Jika ada ticket yang terbuka, refresh status juga
+            const currentTicketCode = document.getElementById('bookingCode')?.textContent;
+            if (currentTicketCode && currentTicketCode === bookingId) {
+                const ticketStatus = document.getElementById('ticketStatus');
+                if (ticketStatus) {
+                    // Update warna status berdasarkan status baru
+                    let statusColor = 'var(--warning-color)';
+                    if (newStatus === 'Disetujui') {
+                        statusColor = 'var(--success-color)';
+                    } else if (newStatus === 'Ditolak') {
+                        statusColor = 'var(--danger-color)';
+                    }
+                    
+                    ticketStatus.textContent = newStatus;
+                    ticketStatus.style.color = statusColor;
                 }
-            } catch (error) {
-                alert('Terjadi kesalahan saat mengubah status');
-                console.error('Error updating status:', error);
             }
-        };
+        } else {
+            alert(`Gagal mengubah status: ${result.message || 'Terjadi kesalahan'}`);
+        }
+    } catch (error) {
+        alert('Terjadi kesalahan koneksi saat mengubah status');
+        console.error('Error updating status:', error);
+    }
+};
 
         // Search functionality for admin table
         document.getElementById('searchInput').addEventListener('input', loadRegistrationData);
@@ -1701,3 +1725,4 @@
     </script>
 </body>
 </html>
+
