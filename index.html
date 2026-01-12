@@ -712,43 +712,6 @@
                 padding: 20px;
             }
         }
-
-//========== CSS LOGIN ===
-/* Login Modal Styles */
-#loginModal {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* Admin Nav Item */
-#adminNavItem a {
-    color: var(--accent-color) !important;
-    font-weight: 600;
-}
-
-#adminNavItem a:hover {
-    color: #e67e22 !important;
-}
-
-/* Admin Header */
-#adminHeader {
-    animation: slideDown 0.5s ease;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
     </style>
 </head>
 <body>
@@ -1083,71 +1046,6 @@
             <div id="pagination" style="display: flex; justify-content: center; margin-top: 20px; gap: 10px;"></div>
         </div>
     </section>
-
-<!-- Login Modal -->
-<div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
-    <div style="background-color: white; border-radius: 10px; width: 90%; max-width: 400px; padding: 30px; box-shadow: 0 5px 30px rgba(0,0,0,0.2);">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2 style="color: var(--primary-color); margin-bottom: 10px;">Login Admin</h2>
-            <p style="color: #666;">Masukkan NIP dan Password</p>
-        </div>
-        
-        <div id="loginMessage" class="message" style="margin-bottom: 20px;"></div>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="nip">NIP <span style="color: red;">*</span></label>
-                <input type="text" id="nip" name="nip" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password <span style="color: red;">*</span></label>
-                <input type="password" id="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px;">
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 30px;">
-                <button type="submit" class="submit-btn" style="flex: 1;">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-                <button type="button" id="closeLoginModal" class="submit-btn" style="flex: 1; background-color: #6c757d;">
-                    <i class="fas fa-times"></i> Batal
-                </button>
-            </div>
-        </form>
-        
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-            <p style="color: #666; font-size: 0.9rem;">
-                <i class="fas fa-info-circle"></i> Akses hanya untuk admin PTSP LAPAS Baubau
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- Admin Nav Item (akan ditampilkan setelah login) -->
-<li id="adminNavItem" style="display: none;">
-    <a href="#admin" id="adminNavLink">
-        <i class="fas fa-user-shield"></i> Admin
-    </a>
-</li>
-
-<!-- Logout Button (akan ditampilkan di admin panel setelah login) -->
-<div id="adminHeader" style="display: none; margin-bottom: 20px; padding: 15px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h3 style="margin: 0; color: var(--primary-color);">
-                <i class="fas fa-user-shield"></i> Panel Admin
-            </h3>
-            <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;" id="adminInfo">
-                Selamat datang, <span id="adminName">Administrator</span>
-            </p>
-        </div>
-        <div>
-            <button id="logoutBtn" class="submit-btn" style="width: auto; padding: 8px 15px; background-color: var(--danger-color);">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </div>
-</div>
 
     <!-- Footer -->
     <footer>
@@ -1635,56 +1533,32 @@
             }
         }
 
-// Update status function (VERSI DIPERBAIKI)
-window.updateStatus = async function(bookingId, newStatus) {
-    if (!bookingId || bookingId === '-') {
-        alert('Booking ID tidak valid');
-        return;
-    }
-    
-    if (!confirm(`Apakah Anda yakin ingin mengubah status booking ${bookingId} menjadi "${newStatus}"?`)) {
-        return;
-    }
-    
-    try {
-        // Encode booking ID untuk URL
-        const encodedBookingId = encodeURIComponent(bookingId);
-        const encodedStatus = encodeURIComponent(newStatus);
-        
-        const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodedBookingId}&status=${encodedStatus}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
-            
-            // Refresh data tabel
-            loadRegistrationData();
-            
-            // Jika ada ticket yang terbuka, refresh status juga
-            const currentTicketCode = document.getElementById('bookingCode')?.textContent;
-            if (currentTicketCode && currentTicketCode === bookingId) {
-                const ticketStatus = document.getElementById('ticketStatus');
-                if (ticketStatus) {
-                    // Update warna status berdasarkan status baru
-                    let statusColor = 'var(--warning-color)';
-                    if (newStatus === 'Disetujui') {
-                        statusColor = 'var(--success-color)';
-                    } else if (newStatus === 'Ditolak') {
-                        statusColor = 'var(--danger-color)';
-                    }
-                    
-                    ticketStatus.textContent = newStatus;
-                    ticketStatus.style.color = statusColor;
-                }
+        // Update status function
+        window.updateStatus = async function(bookingId, newStatus) {
+            if (!bookingId || bookingId === '-') {
+                alert('Booking ID tidak valid');
+                return;
             }
-        } else {
-            alert(`Gagal mengubah status: ${result.message || 'Terjadi kesalahan'}`);
-        }
-    } catch (error) {
-        alert('Terjadi kesalahan koneksi saat mengubah status');
-        console.error('Error updating status:', error);
-    }
-};
+            
+            if (!confirm(`Apakah Anda yakin ingin mengubah status booking ${bookingId} menjadi "${newStatus}"?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodeURIComponent(bookingId)}&status=${encodeURIComponent(newStatus)}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
+                    loadRegistrationData();
+                } else {
+                    alert(`Gagal mengubah status: ${result.message}`);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan saat mengubah status');
+                console.error('Error updating status:', error);
+            }
+        };
 
         // Search functionality for admin table
         document.getElementById('searchInput').addEventListener('input', loadRegistrationData);
