@@ -1065,55 +1065,95 @@
             });
         });
 
-        // Fungsi untuk mendapatkan tanggal besok dalam format Indonesia
+        // Fungsi untuk mendapatkan tanggal besok dalam format DD/MM/YYYY
         function getTomorrowDate() {
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
             
-            // Format menjadi YYYY-MM-DD untuk input date
-            const year = tomorrow.getFullYear();
-            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            // Format menjadi DD/MM/YYYY untuk konsistensi
             const day = String(tomorrow.getDate()).padStart(2, '0');
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const year = tomorrow.getFullYear();
             
-            return `${year}-${month}-${day}`;
+            return `${day}/${month}/${year}`;
         }
 
-        // Fungsi untuk mendapatkan tanggal maksimal (30 hari dari sekarang)
+        // Fungsi untuk mendapatkan tanggal maksimal (30 hari dari sekarang) dalam DD/MM/YYYY
         function getMaxDate() {
             const today = new Date();
             const maxDate = new Date(today);
             maxDate.setDate(today.getDate() + 30);
             
-            // Format menjadi YYYY-MM-DD untuk input date
-            const year = maxDate.getFullYear();
-            const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+            // Format menjadi DD/MM/YYYY untuk konsistensi
             const day = String(maxDate.getDate()).padStart(2, '0');
+            const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+            const year = maxDate.getFullYear();
             
-            return `${year}-${month}-${day}`;
+            return `${day}/${month}/${year}`;
         }
 
-        // Set minimum date for registration form (tomorrow)
-        document.getElementById('tanggal').min = getTomorrowDate();
-        
-        // Set maximum date (30 days from now)
-        document.getElementById('tanggal').max = getMaxDate();
-
-        // Format tanggal Indonesia untuk display
-        function formatDateIndonesia(dateString) {
-            // Jika dateString sudah berupa objek Date
-            let date;
-            if (dateString instanceof Date) {
-                date = dateString;
-            } else {
-                // Jika berupa string, parse dulu
-                // Cek format YYYY-MM-DD
-                if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    date = new Date(dateString + 'T00:00:00');
-                } else {
-                    date = new Date(dateString);
-                }
+        // Fungsi untuk mengonversi DD/MM/YYYY ke YYYY-MM-DD (untuk input date)
+        function formatDateForInput(dateStr) {
+            if (!dateStr) return '';
+            
+            // Jika format sudah YYYY-MM-DD
+            if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                return dateStr;
             }
+            
+            // Jika format DD/MM/YYYY
+            if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                const parts = dateStr.split('/');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            
+            return dateStr;
+        }
+
+        // Fungsi untuk mengonversi YYYY-MM-DD ke DD/MM/YYYY
+        function formatDateToIndonesia(dateStr) {
+            if (!dateStr) return '';
+            
+            // Jika format sudah DD/MM/YYYY
+            if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                return dateStr;
+            }
+            
+            // Jika format YYYY-MM-DD
+            if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const parts = dateStr.split('-');
+                return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            
+            // Jika berupa objek Date
+            if (dateStr instanceof Date) {
+                const day = String(dateStr.getDate()).padStart(2, '0');
+                const month = String(dateStr.getMonth() + 1).padStart(2, '0');
+                const year = dateStr.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+            
+            return dateStr;
+        }
+
+        // Fungsi untuk mengonversi DD/MM/YYYY ke Date object
+        function parseDateFromIndonesia(dateStr) {
+            if (!dateStr) return null;
+            
+            if (dateStr.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                const parts = dateStr.split('/');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            
+            return new Date(dateStr);
+        }
+
+        // Format tanggal Indonesia lengkap untuk display
+        function formatDateIndonesiaFull(date) {
+            // Jika berupa string, parse dulu
+            const dateObj = (date instanceof Date) ? date : parseDateFromIndonesia(date);
+            if (!dateObj) return date;
             
             // Nama hari dalam bahasa Indonesia
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -1124,22 +1164,46 @@
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
             
-            const dayName = days[date.getDay()];
-            const day = date.getDate();
-            const monthName = months[date.getMonth()];
-            const year = date.getFullYear();
+            const dayName = days[dateObj.getDay()];
+            const day = dateObj.getDate();
+            const monthName = months[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
             
             return `${dayName}, ${day} ${monthName} ${year}`;
         }
 
         // Format tanggal dan waktu Indonesia lengkap
         function formatDateTimeIndonesia(date) {
-            const dateStr = formatDateIndonesia(date);
+            const dateStr = formatDateIndonesiaFull(date);
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const seconds = String(date.getSeconds()).padStart(2, '0');
             
             return `${dateStr} ${hours}:${minutes}:${seconds} WITA`;
+        }
+
+        // Set minimum dan maksimum date untuk input date (dalam format YYYY-MM-DD)
+        function setDateInputLimits() {
+            const tanggalInput = document.getElementById('tanggal');
+            if (!tanggalInput) return;
+            
+            // Untuk input date, gunakan format YYYY-MM-DD
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const maxDate = new Date();
+            maxDate.setDate(maxDate.getDate() + 30);
+            
+            // Format untuk input date (YYYY-MM-DD)
+            const formatForInput = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+            
+            tanggalInput.min = formatForInput(tomorrow);
+            tanggalInput.max = formatForInput(maxDate);
         }
 
         // Fungsi untuk update tanggal dan waktu di footer
@@ -1200,8 +1264,8 @@
             }
             
             // Validasi tanggal
-            const tanggal = document.getElementById('tanggal').value;
-            const selectedDate = new Date(tanggal + 'T00:00:00');
+            const tanggalInput = document.getElementById('tanggal').value;
+            const selectedDate = new Date(tanggalInput + 'T00:00:00');
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -1218,6 +1282,10 @@
             submitBtn.textContent = 'Mengirim ke server...';
             submitBtn.disabled = true;
             
+            // Konversi tanggal dari YYYY-MM-DD ke DD/MM/YYYY untuk dikirim ke server
+            const tanggalParts = tanggalInput.split('-');
+            const tanggalFormatted = `${tanggalParts[2]}/${tanggalParts[1]}/${tanggalParts[0]}`;
+            
             // Collect form data
             const formData = {
                 nama: document.getElementById('nama').value,
@@ -1226,7 +1294,7 @@
                 telepon: document.getElementById('telepon').value,
                 alamat: document.getElementById('alamat').value,
                 hubungan: document.getElementById('hubungan').value,
-                tanggal: document.getElementById('tanggal').value,
+                tanggal: tanggalFormatted, // Kirim dalam format DD/MM/YYYY
                 nama_wbp: document.getElementById('nama_wbp').value,
                 keterangan: document.getElementById('keterangan').value
             };
@@ -1249,7 +1317,7 @@
                     document.getElementById('ticketBookingCode').textContent = result.bookingCode;
                     document.getElementById('ticketNama').textContent = formData.nama;
                     document.getElementById('ticketNIK').textContent = formData.nik;
-                    document.getElementById('ticketTanggal').textContent = formatDateIndonesia(formData.tanggal);
+                    document.getElementById('ticketTanggal').textContent = formatDateIndonesiaFull(tanggalFormatted);
                     document.getElementById('ticketWBP').textContent = formData.nama_wbp;
                     document.getElementById('ticketDaftar').textContent = formatDateTimeIndonesia(new Date());
                     
@@ -1268,7 +1336,7 @@
                     registrationForm.reset();
                     
                     // Set tanggal min kembali ke besok
-                    document.getElementById('tanggal').min = getTomorrowDate();
+                    setDateInputLimits();
                     
                 } else {
                     formMessage.textContent = result.message || "Terjadi kesalahan saat menyimpan data.";
@@ -1367,15 +1435,21 @@
                             statusColor = 'var(--danger-color)';
                         }
                         
-                        // Format tanggal untuk display
+                        // Format tanggal untuk display (dari DD/MM/YYYY)
                         let tanggalKunjungan = '-';
-                        if (booking.tanggal_kunjungan) {
-                            if (booking.tanggal_kunjungan.includes('T')) {
-                                tanggalKunjungan = formatDateIndonesia(new Date(booking.tanggal_kunjungan));
-                            } else {
-                                // Format YYYY-MM-DD
-                                tanggalKunjungan = formatDateIndonesia(booking.tanggal_kunjungan);
-                            }
+                        if (booking.tanggal) {
+                            tanggalKunjungan = formatDateIndonesiaFull(booking.tanggal);
+                        } else if (booking.tanggal_kunjungan) {
+                            tanggalKunjungan = formatDateIndonesiaFull(booking.tanggal_kunjungan);
+                        }
+                        
+                        // Format tanggal pendaftaran
+                        let tanggalDaftar = '-';
+                        if (booking.timestamp) {
+                            const date = new Date(booking.timestamp);
+                            tanggalDaftar = formatDateTimeIndonesia(date);
+                        } else if (booking.tanggal_daftar) {
+                            tanggalDaftar = formatDateToIndonesia(booking.tanggal_daftar);
                         }
                         
                         resultContent.innerHTML = `
@@ -1387,6 +1461,10 @@
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Nama:</strong>
                                     <span>${booking.nama || '-'}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>NIK:</strong>
+                                    <span>${booking.nik || '-'}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Tanggal Kunjungan:</strong>
@@ -1406,7 +1484,7 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Tanggal Daftar:</strong>
-                                    <span>${booking.timestamp ? formatDateTimeIndonesia(new Date(booking.timestamp)) : '-'}</span>
+                                    <span>${tanggalDaftar}</span>
                                 </div>
                                 ${booking.keterangan ? `
                                 <div style="margin-top: 15px;">
@@ -1451,7 +1529,7 @@
                                         <div class="info"><span class="label">Nama WBP:</span> ${booking.nama_wbp || '-'}</div>
                                         <div class="info"><span class="label">Hubungan:</span> ${booking.hubungan || '-'}</div>
                                         <div class="info"><span class="label">Status:</span> <span class="status">${statusText}</span></div>
-                                        <div class="info"><span class="label">Tanggal Daftar:</span> ${booking.timestamp ? formatDateTimeIndonesia(new Date(booking.timestamp)) : '-'}</div>
+                                        <div class="info"><span class="label">Tanggal Daftar:</span> ${tanggalDaftar}</div>
                                         ${booking.keterangan ? `<div class="info"><span class="label">Keterangan:</span> ${booking.keterangan}</div>` : ''}
                                         <div class="footer">
                                             Dicetak pada: ${formatDateTimeIndonesia(printDate)}<br>
@@ -1551,6 +1629,7 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadServices();
+            setDateInputLimits();
             
             // Set current year in footer
             document.getElementById('currentYear').textContent = new Date().getFullYear();
