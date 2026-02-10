@@ -740,7 +740,6 @@
                     <li><a href="#registration">Pendaftaran Kunjungan</a></li>
                     <li><a href="#verification">Cek Booking</a></li>
                     <li><a href="#information">Informasi</a></li>
-                    <!-- Tombol Antrian dihapus -->
                 </ul>
             </nav>
         </div>
@@ -834,7 +833,7 @@
                     
                     <div class="form-group">
                         <label for="nama_wbp">Nama WBP yang akan dikunjungi <span style="color: red;">*</span></label>
-                        <input type="text" id="nama_wbp" name="nama_wbp" required>
+                            <input type="text" id="nama_wbp" name="nama_wbp" required>
                     </div>
                     
                     <div class="form-group">
@@ -989,8 +988,6 @@
         </div>
     </section>
 
-    <!-- Admin Section DIHAPUS -->
-
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -1025,6 +1022,7 @@
             
             <div class="copyright">
                 <p>&copy; <span id="currentYear">2023</span> PTSP LAPAS Kelas IIA Baubau. Semua hak dilindungi.</p>
+                <p id="currentDateTime" style="margin-top: 5px; font-size: 0.8rem;"></p>
             </div>
         </div>
     </footer>
@@ -1067,24 +1065,94 @@
             });
         });
 
-        // Set minimum date for registration form (today + 1 day)
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
-        document.getElementById('tanggal').min = tomorrowFormatted;
-
-        // Set maximum date (30 days from now)
-        const maxDate = new Date();
-        maxDate.setDate(maxDate.getDate() + 30);
-        const maxDateFormatted = maxDate.toISOString().split('T')[0];
-        document.getElementById('tanggal').max = maxDateFormatted;
-
-        // Format tanggal untuk display
-        function formatDate(dateString) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', options);
+        // Fungsi untuk mendapatkan tanggal besok dalam format Indonesia
+        function getTomorrowDate() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            // Format menjadi YYYY-MM-DD untuk input date
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}`;
         }
+
+        // Fungsi untuk mendapatkan tanggal maksimal (30 hari dari sekarang)
+        function getMaxDate() {
+            const today = new Date();
+            const maxDate = new Date(today);
+            maxDate.setDate(today.getDate() + 30);
+            
+            // Format menjadi YYYY-MM-DD untuk input date
+            const year = maxDate.getFullYear();
+            const month = String(maxDate.getMonth() + 1).padStart(2, '0');
+            const day = String(maxDate.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}`;
+        }
+
+        // Set minimum date for registration form (tomorrow)
+        document.getElementById('tanggal').min = getTomorrowDate();
+        
+        // Set maximum date (30 days from now)
+        document.getElementById('tanggal').max = getMaxDate();
+
+        // Format tanggal Indonesia untuk display
+        function formatDateIndonesia(dateString) {
+            // Jika dateString sudah berupa objek Date
+            let date;
+            if (dateString instanceof Date) {
+                date = dateString;
+            } else {
+                // Jika berupa string, parse dulu
+                // Cek format YYYY-MM-DD
+                if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    date = new Date(dateString + 'T00:00:00');
+                } else {
+                    date = new Date(dateString);
+                }
+            }
+            
+            // Nama hari dalam bahasa Indonesia
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            
+            // Nama bulan dalam bahasa Indonesia
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const monthName = months[date.getMonth()];
+            const year = date.getFullYear();
+            
+            return `${dayName}, ${day} ${monthName} ${year}`;
+        }
+
+        // Format tanggal dan waktu Indonesia lengkap
+        function formatDateTimeIndonesia(date) {
+            const dateStr = formatDateIndonesia(date);
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            
+            return `${dateStr} ${hours}:${minutes}:${seconds} WITA`;
+        }
+
+        // Fungsi untuk update tanggal dan waktu di footer
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeStr = formatDateTimeIndonesia(now);
+            document.getElementById('currentDateTime').textContent = 
+                `Halaman diakses pada: ${dateTimeStr}`;
+        }
+
+        // Update datetime setiap detik
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
 
         // Fungsi untuk generate QR Code
         function generateQRCode(bookingCode) {
@@ -1133,12 +1201,12 @@
             
             // Validasi tanggal
             const tanggal = document.getElementById('tanggal').value;
-            const selectedDate = new Date(tanggal);
+            const selectedDate = new Date(tanggal + 'T00:00:00');
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
             if (selectedDate <= today) {
-                formMessage.textContent = "Tanggal kunjungan harus hari ini atau lebih!";
+                formMessage.textContent = "Tanggal kunjungan harus hari besok atau lebih!";
                 formMessage.className = "message error";
                 formMessage.style.display = "block";
                 return;
@@ -1181,9 +1249,9 @@
                     document.getElementById('ticketBookingCode').textContent = result.bookingCode;
                     document.getElementById('ticketNama').textContent = formData.nama;
                     document.getElementById('ticketNIK').textContent = formData.nik;
-                    document.getElementById('ticketTanggal').textContent = formatDate(formData.tanggal);
+                    document.getElementById('ticketTanggal').textContent = formatDateIndonesia(formData.tanggal);
                     document.getElementById('ticketWBP').textContent = formData.nama_wbp;
-                    document.getElementById('ticketDaftar').textContent = new Date().toLocaleDateString('id-ID');
+                    document.getElementById('ticketDaftar').textContent = formatDateTimeIndonesia(new Date());
                     
                     // Generate QR Code
                     generateQRCode(result.bookingCode);
@@ -1198,6 +1266,9 @@
                     
                     // Reset form
                     registrationForm.reset();
+                    
+                    // Set tanggal min kembali ke besok
+                    document.getElementById('tanggal').min = getTomorrowDate();
                     
                 } else {
                     formMessage.textContent = result.message || "Terjadi kesalahan saat menyimpan data.";
@@ -1220,7 +1291,39 @@
 
         // Print ticket
         document.getElementById('printTicket').addEventListener('click', function() {
+            const printContent = document.getElementById('ticketContainer').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html lang="id">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Tiket Kunjungan LAPAS Baubau</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .ticket-container { border: 2px solid #000; padding: 20px; max-width: 600px; margin: 0 auto; }
+                        .ticket-header { text-align: center; margin-bottom: 20px; }
+                        .ticket-code { font-size: 24px; font-weight: bold; text-align: center; padding: 15px; border: 2px dashed #ccc; margin: 20px 0; }
+                        .ticket-details { margin: 20px 0; }
+                        .ticket-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+                        .ticket-label { font-weight: bold; }
+                        .print-info { margin-top: 30px; font-size: 12px; color: #666; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                    <div class="print-info">
+                        Dicetak pada: ${formatDateTimeIndonesia(new Date())}<br>
+                        LAPAS Kelas IIA Baubau - Jl. Sudirman No. 45, Baubau
+                    </div>
+                </body>
+                </html>
+            `;
+            
             window.print();
+            document.body.innerHTML = originalContent;
+            location.reload();
         });
 
         // Check booking status dari Google Sheets
@@ -1264,6 +1367,17 @@
                             statusColor = 'var(--danger-color)';
                         }
                         
+                        // Format tanggal untuk display
+                        let tanggalKunjungan = '-';
+                        if (booking.tanggal_kunjungan) {
+                            if (booking.tanggal_kunjungan.includes('T')) {
+                                tanggalKunjungan = formatDateIndonesia(new Date(booking.tanggal_kunjungan));
+                            } else {
+                                // Format YYYY-MM-DD
+                                tanggalKunjungan = formatDateIndonesia(booking.tanggal_kunjungan);
+                            }
+                        }
+                        
                         resultContent.innerHTML = `
                             <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
@@ -1276,15 +1390,23 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Tanggal Kunjungan:</strong>
-                                    <span>${booking.tanggal_kunjungan ? formatDate(booking.tanggal_kunjungan) : '-'}</span>
+                                    <span>${tanggalKunjungan}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Nama WBP:</strong>
                                     <span>${booking.nama_wbp || '-'}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>Hubungan:</strong>
+                                    <span>${booking.hubungan || '-'}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                     <strong>Status:</strong>
                                     <span style="color: ${statusColor}; font-weight: 600;">${statusText}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <strong>Tanggal Daftar:</strong>
+                                    <span>${booking.timestamp ? formatDateTimeIndonesia(new Date(booking.timestamp)) : '-'}</span>
                                 </div>
                                 ${booking.keterangan ? `
                                 <div style="margin-top: 15px;">
@@ -1306,33 +1428,43 @@
                         setTimeout(() => {
                             document.getElementById('printBookingInfo').addEventListener('click', function() {
                                 const printWindow = window.open('', '_blank');
+                                const printDate = new Date();
                                 printWindow.document.write(`
                                     <html>
                                     <head>
                                         <title>Status Booking ${booking.booking_id || bookingCode}</title>
                                         <style>
                                             body { font-family: Arial, sans-serif; padding: 20px; }
-                                            h1 { color: #1a5f7a; }
-                                            .info { margin: 15px 0; }
-                                            .label { font-weight: bold; }
+                                            h1 { color: #1a5f7a; border-bottom: 2px solid #1a5f7a; padding-bottom: 10px; }
+                                            .info { margin: 15px 0; padding: 10px; border-bottom: 1px solid #eee; }
+                                            .label { font-weight: bold; display: inline-block; width: 180px; }
                                             .status { font-weight: bold; color: ${statusColor}; }
+                                            .footer { margin-top: 40px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 12px; color: #666; text-align: center; }
                                         </style>
                                     </head>
                                     <body>
                                         <h1>Status Booking LAPAS Baubau</h1>
                                         <div class="info"><span class="label">Kode Booking:</span> ${booking.booking_id || bookingCode}</div>
-                                        <div class="info"><span class="label">Nama:</span> ${booking.nama || '-'}</div>
-                                        <div class="info"><span class="label">Tanggal Kunjungan:</span> ${booking.tanggal_kunjungan ? formatDate(booking.tanggal_kunjungan) : '-'}</div>
+                                        <div class="info"><span class="label">Nama Pengunjung:</span> ${booking.nama || '-'}</div>
+                                        <div class="info"><span class="label">NIK:</span> ${booking.nik || '-'}</div>
+                                        <div class="info"><span class="label">Tanggal Kunjungan:</span> ${tanggalKunjungan}</div>
                                         <div class="info"><span class="label">Nama WBP:</span> ${booking.nama_wbp || '-'}</div>
+                                        <div class="info"><span class="label">Hubungan:</span> ${booking.hubungan || '-'}</div>
                                         <div class="info"><span class="label">Status:</span> <span class="status">${statusText}</span></div>
-                                        <p style="margin-top: 30px; font-size: 0.9em; color: #666;">
-                                            Dicetak pada: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}
-                                        </p>
+                                        <div class="info"><span class="label">Tanggal Daftar:</span> ${booking.timestamp ? formatDateTimeIndonesia(new Date(booking.timestamp)) : '-'}</div>
+                                        ${booking.keterangan ? `<div class="info"><span class="label">Keterangan:</span> ${booking.keterangan}</div>` : ''}
+                                        <div class="footer">
+                                            Dicetak pada: ${formatDateTimeIndonesia(printDate)}<br>
+                                            LAPAS Kelas IIA Baubau - Jl. Sudirman No. 45, Baubau<br>
+                                            Telepon: (0402) 1234567 | Email: ptsp@lapasbaubau.go.id
+                                        </div>
                                     </body>
                                     </html>
                                 `);
                                 printWindow.document.close();
-                                printWindow.print();
+                                setTimeout(() => {
+                                    printWindow.print();
+                                }, 500);
                             });
                         }, 100);
                         
