@@ -1030,12 +1030,12 @@
                             <th>Tanggal Kunjungan</th>
                             <th>Nama WBP</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <!-- Kolom Aksi dihapus -->
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="9" class="loading">
+                            <td colspan="8" class="loading">
                                 <i class="fas fa-spinner fa-spin"></i> Memuat data dari spreadsheet...
                             </td>
                         </tr>
@@ -1423,7 +1423,7 @@
             // Show loading
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="loading">
+                    <td colspan="8" class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Memuat data dari spreadsheet...
                     </td>
                 </tr>
@@ -1462,7 +1462,7 @@
                     if (filteredData.length === 0) {
                         tableBody.innerHTML = `
                             <tr>
-                                <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                                <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
                                     <i class="fas fa-database"></i> Tidak ada data ditemukan
                                 </td>
                             </tr>
@@ -1500,21 +1500,13 @@
                             <td>${item.tanggal_kunjungan ? formatDate(item.tanggal_kunjungan) : '-'}</td>
                             <td>${item.nama_wbp || '-'}</td>
                             <td>${statusBadge}</td>
-                            <td>
-                                <button onclick="updateStatus('${item.booking_id}', 'Disetujui')" class="status-btn" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px; font-size: 0.8rem;">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button onclick="updateStatus('${item.booking_id}', 'Ditolak')" class="status-btn" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </td>
                         `;
                         tableBody.appendChild(row);
                     });
                 } else {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                            <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
                                 <i class="fas fa-exclamation-triangle"></i> ${result.message || 'Gagal memuat data'}
                             </td>
                         </tr>
@@ -1524,7 +1516,7 @@
             } catch (error) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="9" style="text-align: center; padding: 40px; color: #666;">
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #666;">
                             <i class="fas fa-exclamation-triangle"></i> Error: ${error.message}
                         </td>
                     </tr>
@@ -1532,33 +1524,6 @@
                 console.error('Error loading data:', error);
             }
         }
-
-        // Update status function
-        window.updateStatus = async function(bookingId, newStatus) {
-            if (!bookingId || bookingId === '-') {
-                alert('Booking ID tidak valid');
-                return;
-            }
-            
-            if (!confirm(`Apakah Anda yakin ingin mengubah status booking ${bookingId} menjadi "${newStatus}"?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${WEB_APP_URL}?parameter=update&bookingCode=${encodeURIComponent(bookingId)}&status=${encodeURIComponent(newStatus)}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert(`Status booking ${bookingId} berhasil diubah menjadi "${newStatus}"`);
-                    loadRegistrationData();
-                } else {
-                    alert(`Gagal mengubah status: ${result.message}`);
-                }
-            } catch (error) {
-                alert('Terjadi kesalahan saat mengubah status');
-                console.error('Error updating status:', error);
-            }
-        };
 
         // Search functionality for admin table
         document.getElementById('searchInput').addEventListener('input', loadRegistrationData);
