@@ -937,6 +937,227 @@
         print-color-adjust: exact;
     }
 }
+        /* Container untuk persetujuan */
+.agreement-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+    border-left: 5px solid var(--primary-color);
+    margin: 25px 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.agreement-container:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Header persetujuan */
+.agreement-container h4 {
+    color: var(--primary-color);
+    margin-bottom: 18px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.agreement-container h4 i {
+    font-size: 1.3rem;
+}
+
+/* Checkbox dan kontennya */
+.agreement-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+/* Checkbox itu sendiri */
+.agreement-checkbox input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    flex-shrink: 0;
+    border: 2px solid #ced4da;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.agreement-checkbox input[type="checkbox"]:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.agreement-checkbox input[type="checkbox"]:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+
+/* Label checkbox */
+.agreement-checkbox label {
+    font-weight: 600;
+    color: var(--dark-color);
+    cursor: pointer;
+    display: block;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+    transition: color 0.2s ease;
+}
+
+.agreement-checkbox label:hover {
+    color: var(--primary-color);
+}
+
+/* Daftar persetujuan */
+.agreement-checkbox ul {
+    color: #555;
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+.agreement-checkbox ul li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 5px;
+}
+
+.agreement-checkbox ul li:before {
+    content: "•";
+    color: var(--secondary-color);
+    font-weight: bold;
+    font-size: 1.2em;
+    position: absolute;
+    left: -15px;
+}
+
+/* Info box */
+.agreement-info {
+    background-color: #e8f4fc;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #b8daff;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.agreement-info i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.agreement-info p {
+    color: #0c5460;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* States */
+/* Ketika checkbox dicentang */
+.agreement-checkbox input[type="checkbox"]:checked ~ div label {
+    color: var(--success-color);
+}
+
+.agreement-container.checked {
+    border-left-color: var(--success-color);
+    background-color: #f0f9f0;
+}
+
+/* Ketika checkbox invalid (required tapi belum dicentang) */
+.agreement-checkbox input[type="checkbox"]:invalid {
+    border-color: var(--danger-color);
+}
+
+.agreement-checkbox input[type="checkbox"]:invalid ~ div label {
+    color: var(--danger-color);
+}
+
+.agreement-container.invalid {
+    border-left-color: var(--danger-color);
+    background-color: #fdf2f2;
+    animation: shake 0.5s;
+}
+
+/* Animasi shake untuk validasi */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive design untuk agreement */
+@media (max-width: 768px) {
+    .agreement-container {
+        padding: 20px 15px;
+        margin: 20px 0;
+    }
+    
+    .agreement-checkbox {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+    }
+    
+    .agreement-checkbox input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        margin-top: 0;
+        align-self: flex-start;
+    }
+    
+    .agreement-info {
+        padding: 12px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .agreement-info i {
+        align-self: flex-start;
+    }
+}
+
+/* Efek fokus untuk aksesibilitas */
+.agreement-checkbox input[type="checkbox"]:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
+}
+
+/* Efek smooth transition */
+.agreement-container,
+.agreement-checkbox,
+.agreement-checkbox input[type="checkbox"],
+.agreement-checkbox label,
+.agreement-info {
+    transition: all 0.3s ease;
+}
+
+/* Tambahan untuk print */
+@media print {
+    .agreement-container {
+        background-color: white !important;
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    
+    .agreement-checkbox input[type="checkbox"] {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
     </style>
 </head>
 <body>
@@ -1862,5 +2083,6 @@
     </script>
 </body>
 </html>
+
 
 
